@@ -1,4 +1,4 @@
-﻿
+﻿using DPA_Musicsheets.Factory;
 using DPA_Musicsheets.Models;
 using DPA_Musicsheets.ViewModels;
 using PSAMControlLibrary;
@@ -24,7 +24,7 @@ namespace DPA_Musicsheets.Managers
     {
         #region Properties
         public string LilypondText { get; set; }
-        public List<MusicalSymbol> WPFStaffs { get; set; } = new List<MusicalSymbol>();
+        public List<PSAMControlLibrary.MusicalSymbol> WPFStaffs { get; set; } = new List<PSAMControlLibrary.MusicalSymbol>();
         private static List<Char> notesorder = new List<Char> { 'c', 'd', 'e', 'f', 'g', 'a', 'b' };
 
         public Sequence MidiSequence { get; set; }
@@ -42,12 +42,15 @@ namespace DPA_Musicsheets.Managers
         /// <summary>
         /// Opens a file.
         /// TODO: Remove the switch cases and delegate.
-        /// TODO: Remove the knowledge of filetypes. What if we want to support MusicXML later?
+        /// TODO: Remove the knowledge of filetypes. What if we want to support MusicXML later? DONE
         /// TODO: Remove the calling of the outer viewmodel layer. We want to be able reuse this in an ASP.NET Core application for example.
         /// </summary>
         /// <param name="fileName"></param>
         public void OpenFile(string fileName)
         {
+            FileLoaderFactory factory = new FileLoaderFactory();
+            FileLoader loader = factory.GetLoader(Path.GetExtension(fileName));
+
             if (Path.GetExtension(fileName).EndsWith(".mid"))
             {
                 MidiSequence = new Sequence();
@@ -208,9 +211,9 @@ namespace DPA_Musicsheets.Managers
         #endregion Midiloading (loads midi to lilypond)
 
         #region Staffs loading (loads lilypond to WPF staffs)
-        private static IEnumerable<MusicalSymbol> GetStaffsFromTokens(LinkedList<LilypondToken> tokens)
+        private static IEnumerable<PSAMControlLibrary.MusicalSymbol> GetStaffsFromTokens(LinkedList<LilypondToken> tokens)
         {
-            List<MusicalSymbol> symbols = new List<MusicalSymbol>();
+            List<PSAMControlLibrary.MusicalSymbol> symbols = new List<PSAMControlLibrary.MusicalSymbol>();
 
             Clef currentClef = null;
             int previousOctave = 4;

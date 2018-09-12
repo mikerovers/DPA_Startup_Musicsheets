@@ -103,10 +103,21 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Factory\FileLoaderFactory.cs" />
+    <Compile Include="Managers\Adapter\LilyAdapter.cs" />
+    <Compile Include="Managers\FileLoader.cs" />
+    <Compile Include="Managers\LilyPondLoader.cs" />
+    <Compile Include="Managers\Adapter\MidiAdapter.cs" />
+    <Compile Include="Managers\MidiFileLoader.cs" />
     <Compile Include="Managers\MidiToLilyHelper.cs" />
     <Compile Include="Managers\MusicLoader.cs" />
     <Compile Include="Models\LilypondToken.cs" />
     <Compile Include="Models\LilypondTokenKind.cs" />
+    <Compile Include="Models\MusicNote.cs" />
+    <Compile Include="Models\MusicalSymbol.cs" />
+    <Compile Include="Models\SymbolDuration.cs" />
+    <Compile Include="Models\Rest.cs" />
+    <Compile Include="Models\TimesSignature.cs" />
     <Compile Include="ViewModels\MidiPlayerViewModel.cs" />
     <Compile Include="ViewModels\StaffsViewModel.cs" />
     <Compile Include="Views\MidiPlayerCtrl.xaml.cs">
