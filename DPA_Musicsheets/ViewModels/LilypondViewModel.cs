@@ -1,10 +1,12 @@
-﻿using DPA_Musicsheets.Managers;
+﻿using DPA_Musicsheets.History;
+using DPA_Musicsheets.Managers;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.Win32;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -16,9 +18,8 @@ namespace DPA_Musicsheets.ViewModels
         private MusicLoader _musicLoader;
         private MainViewModel _mainViewModel { get; set; }
 
-        private string _text;
-        private string _previousText;
-        private string _nextText;
+        private HistoryOriginator _historyOriginator;
+        private HistoryCareTaker _historyCareTaker;
 
         /// <summary>
         /// This text will be in the textbox.
@@ -28,15 +29,11 @@ namespace DPA_Musicsheets.ViewModels
         {
             get
             {
-                return _text;
+                return _historyOriginator.GetState();
             }
             set
             {
-                if (!_waitingForRender && !_textChangedByLoad)
-                {
-                    _previousText = _text;
-                }
-                _text = value;
+                _historyOriginator.SetState(value);
                 RaisePropertyChanged(() => LilypondText);
             }
         }
@@ -54,13 +51,16 @@ namespace DPA_Musicsheets.ViewModels
             _musicLoader = musicLoader;
             _musicLoader.LilypondViewModel = this;
             
-            _text = "Your lilypond text will appear here.";
+            this._historyCareTaker = new HistoryCareTaker();
+            this._historyOriginator = new HistoryOriginator();
+            LilypondText = "Please write your music here...";
         }
 
         public void LilypondTextLoaded(string text)
         {
             _textChangedByLoad = true;
-            LilypondText = _previousText = text;
+            LilypondText = text;
+            _historyCareTaker = new HistoryCareTaker();
             _textChangedByLoad = false;
         }
 
@@ -71,7 +71,7 @@ namespace DPA_Musicsheets.ViewModels
         {
             // If we were typing, we need to do things.
             if (!_textChangedByLoad)
-            {
+            {      
                 _waitingForRender = true;
                 _lastChange = DateTime.Now;
 
@@ -86,6 +86,9 @@ namespace DPA_Musicsheets.ViewModels
 
                         _musicLoader.LoadLilypondIntoWpfStaffsAndMidi(LilypondText);
                         _mainViewModel.CurrentState = "";
+
+                        HistoryMomento tet = _historyOriginator.Save();
+                        this._historyCareTaker.AddMomento(tet);
                     }
                 }, TaskScheduler.FromCurrentSynchronizationContext()); // Request from main thread.
             }
@@ -94,18 +97,15 @@ namespace DPA_Musicsheets.ViewModels
         #region Commands for buttons like Undo, Redo and SaveAs
         public RelayCommand UndoCommand => new RelayCommand(() =>
         {
-            _nextText = LilypondText;
-            LilypondText = _previousText;
-            _previousText = null;
-        }, () => _previousText != null && _previousText != LilypondText);
+            HistoryMomento h = _historyCareTaker.Undo();
+            LilypondText = h.GetState();
+        }, () => _historyCareTaker.CanUndo());
 
         public RelayCommand RedoCommand => new RelayCommand(() =>
         {
-            _previousText = LilypondText;
-            LilypondText = _nextText;
-            _nextText = null;
-            RedoCommand.RaiseCanExecuteChanged();
-        }, () => _nextText != null && _nextText != LilypondText);
+            HistoryMomento h = _historyCareTaker.Redo();
+            LilypondText = h.GetState();
+        }, () => _historyCareTaker.CanRedo());
 
         public ICommand SaveAsCommand => new RelayCommand(() =>
         {

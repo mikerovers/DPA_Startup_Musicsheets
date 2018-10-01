@@ -15,7 +15,7 @@ namespace DPA_Musicsheets.Managers
             this.adaptee = adaptee;
         }
 
-        public void LoadFile(string fileName)
+        public string LoadFile(string fileName)
         {
             throw new NotImplementedException();
         }

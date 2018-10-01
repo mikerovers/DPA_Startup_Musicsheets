@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Linq;  
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DPA_Musicsheets.Models
 {
-    class MusicalSymbol
+    abstract class MusicalSymbol
     {
         protected SymbolDuration duration;
+
+        abstract public string toLilyPond();
     }
 }

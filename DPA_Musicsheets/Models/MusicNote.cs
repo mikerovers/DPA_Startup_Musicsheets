@@ -14,8 +14,14 @@ namespace DPA_Musicsheets.Models
 
     class MusicNote : MusicalSymbol
     {
-        private int octave;
-        private NotePitch pitch;
-        private int numberOfDots;
+        public int octave;
+        public NotePitch pitch;
+        public SymbolDuration duration;
+        public int numberOfDots;
+
+        public override string toLilyPond()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

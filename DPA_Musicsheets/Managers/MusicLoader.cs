@@ -33,6 +33,7 @@ namespace DPA_Musicsheets.Managers
         private int _beatNote = 4;    // De waarde van een beatnote.
         private int _bpm = 120;       // Aantal beatnotes per minute.
         private int _beatsPerBar;     // Aantal beatnotes per maat.
+        private Models.TimesSignature _timeSignature = new Models.TimesSignature();
 
         public MainViewModel MainViewModel { get; set; }
         public LilypondViewModel LilypondViewModel { get; set; }
@@ -42,7 +43,7 @@ namespace DPA_Musicsheets.Managers
         /// <summary>
         /// Opens a file.
         /// TODO: Remove the switch cases and delegate.
-        /// TODO: Remove the knowledge of filetypes. What if we want to support MusicXML later? DONE
+        /// TODO: Remove the knowledge of filetypes. What if we want to support MusicXML later?
         /// TODO: Remove the calling of the outer viewmodel layer. We want to be able reuse this in an ASP.NET Core application for example.
         /// </summary>
         /// <param name="fileName"></param>
@@ -89,7 +90,7 @@ namespace DPA_Musicsheets.Managers
         {
             LilypondText = content;
             content = content.Trim().ToLower().Replace("\r\n", " ").Replace("\n", " ").Replace("  ", " ");
-            LinkedList<LilypondToken> tokens = GetTokensFromLilypond(content);
+            LinkedList<LilypondToken>               tokens = GetTokensFromLilypond(content);
             WPFStaffs.Clear();
 
             WPFStaffs.AddRange(GetStaffsFromTokens(tokens));
@@ -100,6 +101,24 @@ namespace DPA_Musicsheets.Managers
         }
 
         #region Midi loading (loads midi to lilypond)
+
+        private int calculateTempoBPM(MetaMessage metaMessage)
+        {
+            byte[] tempoBytes = metaMessage.GetBytes();
+            int tempo = (tempoBytes[0] & 0xff) << 16 | (tempoBytes[1] & 0xff) << 8 | (tempoBytes[2] & 0xff);
+            _bpm = 60000000 / tempo;
+
+            return _bpm;
+        }
+
+        private int calculateTimeSignature(MetaMessage metaMessage)
+        {
+            byte[] timeSignatureBytes = metaMessage.GetBytes();
+            _beatNote = timeSignatureBytes[0];
+            _beatsPerBar = (int)(1 / Math.Pow(timeSignatureBytes[1], -2));
+
+            return _beatNote / _beatsPerBar;
+        }
 
         /// <summary>
         /// TODO: Create our own domain classes to be independent of external libraries/languages.
@@ -120,7 +139,7 @@ namespace DPA_Musicsheets.Managers
 
             for (int i = 0; i < sequence.Count(); i++)
             {
-                Track track = sequence[i];
+                Sanford.Multimedia.Midi.Track track = sequence[i];
 
                 foreach (var midiEvent in track.Iterator())
                 {
@@ -135,23 +154,24 @@ namespace DPA_Musicsheets.Managers
                             switch (metaMessage.MetaType)
                             {
                                 case MetaType.TimeSignature:
-                                    byte[] timeSignatureBytes = metaMessage.GetBytes();
-                                    _beatNote = timeSignatureBytes[0];
-                                    _beatsPerBar = (int)(1 / Math.Pow(timeSignatureBytes[1], -2));
-                                    lilypondContent.AppendLine($"\\time {_beatNote}/{_beatsPerBar}");
+                                    this._timeSignature = new Models.TimesSignature(metaMessage);
+                                    lilypondContent.AppendLine(this._timeSignature.toLilyPond());
+                                    _beatNote = this._timeSignature.numberOfBeats;
+                                    _beatsPerBar = this._timeSignature.beatsPerBar;
+
                                     break;
                                 case MetaType.Tempo:
-                                    byte[] tempoBytes = metaMessage.GetBytes();
-                                    int tempo = (tempoBytes[0] & 0xff) << 16 | (tempoBytes[1] & 0xff) << 8 | (tempoBytes[2] & 0xff);
-                                    _bpm = 60000000 / tempo;
-                                    lilypondContent.AppendLine($"\\tempo 4={_bpm}");
+                                    Models.TempoSignature tempoSignature = new Models.TempoSignature(metaMessage);
+                                    lilypondContent.AppendLine(tempoSignature.toLilyPond());
+                                    this._bpm = tempoSignature.bpm;
+
                                     break;
                                 case MetaType.EndOfTrack:
-                                    if (previousNoteAbsoluteTicks > 0)
+                                    if (previousNoteAbsoluteTicks > 0)  
                                     {
                                         // Finish the last notelength.
                                         double percentageOfBar;
-                                        lilypondContent.Append(MidiToLilyHelper.GetLilypondNoteLength(previousNoteAbsoluteTicks, midiEvent.AbsoluteTicks, division, _beatNote, _beatsPerBar, out percentageOfBar));
+                                        lilypondContent.Append(MidiToLilyHelper.GetLilypondNoteLength(previousNoteAbsoluteTicks, midiEvent.AbsoluteTicks, division, this._timeSignature.numberOfBeats, this._timeSignature.beatsPerBar, out percentageOfBar));
                                         lilypondContent.Append(" ");
 
                                         percentageOfBarReached += percentageOfBar;
@@ -417,7 +437,7 @@ namespace DPA_Musicsheets.Managers
 
             Sequence sequence = new Sequence();
 
-            Track metaTrack = new Track();
+            Sanford.Multimedia.Midi.Track metaTrack = new Sanford.Multimedia.Midi.Track();
             sequence.Add(metaTrack);
 
             // Calculate tempo
@@ -428,7 +448,7 @@ namespace DPA_Musicsheets.Managers
             tempo[2] = (byte)(speed & 0xff);
             metaTrack.Insert(0 /* Insert at 0 ticks*/, new MetaMessage(MetaType.Tempo, tempo));
 
-            Track notesTrack = new Track();
+            Sanford.Multimedia.Midi.Track notesTrack = new Sanford.Multimedia.Midi.Track();
             sequence.Add(notesTrack);
 
             for (int i = 0; i < WPFStaffs.Count; i++)

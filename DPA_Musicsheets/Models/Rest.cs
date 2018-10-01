@@ -8,6 +8,11 @@ namespace DPA_Musicsheets.Models
 {
     class Reste : MusicalSymbol
     {
-        private SymbolDuration duration;
+        public SymbolDuration duration;
+
+        public override string toLilyPond()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
