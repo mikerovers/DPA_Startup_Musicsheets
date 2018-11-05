@@ -10,10 +10,15 @@ namespace DPA_Musicsheets.Models
     {
         public Pitch pitch;
         public int octave;
-        public Key key;
-        public Division length;
+        public string key;
+        public string length;
 
-        public Note(Pitch pitch, int octave, Division length, Key key)
+        public Note()
+        {
+
+        }
+
+        public Note(Pitch pitch, int octave, string length, string key)
         {
             this.length = length;
             this.key = key;

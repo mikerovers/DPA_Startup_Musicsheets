@@ -1,8 +1,8 @@
 ﻿
+using DPA_Musicsheets.Converter.Midi;
 using DPA_Musicsheets.Models;
 using DPA_Musicsheets.ViewModels;
 using PSAMControlLibrary;
-using PSAMWPFControlLibrary;
 using Sanford.Multimedia.Midi;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using Clef = PSAMControlLibrary.Clef;
+using ClefType = PSAMControlLibrary.ClefType;
+using Note = PSAMControlLibrary.Note;
+using Rest = PSAMControlLibrary.Rest;
+using TimeSignature = PSAMControlLibrary.TimeSignature;
 
 namespace DPA_Musicsheets.Managers
 {
@@ -105,6 +109,9 @@ namespace DPA_Musicsheets.Managers
         /// <returns></returns>
         public string LoadMidiIntoLilypond(Sequence sequence)
         {
+            FromMidiConverter converter = new FromMidiConverter();
+            converter.division = sequence.Division;
+
             StringBuilder lilypondContent = new StringBuilder();
             lilypondContent.AppendLine("\\relative c' {");
             lilypondContent.AppendLine("\\clef treble");
@@ -132,30 +139,34 @@ namespace DPA_Musicsheets.Managers
                             switch (metaMessage.MetaType)
                             {
                                 case MetaType.TimeSignature:
-                                    byte[] timeSignatureBytes = metaMessage.GetBytes();
-                                    _beatNote = timeSignatureBytes[0];
-                                    _beatsPerBar = (int)(1 / Math.Pow(timeSignatureBytes[1], -2));
-                                    lilypondContent.AppendLine($"\\time {_beatNote}/{_beatsPerBar}");
+                                    var ts = converter.HandleTimeSignature(metaMessage, midiEvent);
+                                    _beatNote = converter._beatNote;
+                                    _beatsPerBar = converter._beatsPerBar;
+                                    _bpm = converter._bpm;
+
+                                    lilypondContent.AppendLine($"\\time {ts.before}/{ts.after}");
                                     break;
                                 case MetaType.Tempo:
-                                    byte[] tempoBytes = metaMessage.GetBytes();
-                                    int tempo = (tempoBytes[0] & 0xff) << 16 | (tempoBytes[1] & 0xff) << 8 | (tempoBytes[2] & 0xff);
-                                    _bpm = 60000000 / tempo;
+                                    var tm = converter.HandleTempo(metaMessage, midiEvent);
+                                    _bpm = 60000000 / tm.tempo;
+
                                     lilypondContent.AppendLine($"\\tempo 4={_bpm}");
                                     break;
                                 case MetaType.EndOfTrack:
                                     if (previousNoteAbsoluteTicks > 0)
                                     {
                                         // Finish the last notelength.
-                                        double percentageOfBar;
-                                        lilypondContent.Append(MidiToLilyHelper.GetLilypondNoteLength(previousNoteAbsoluteTicks, midiEvent.AbsoluteTicks, division, _beatNote, _beatsPerBar, out percentageOfBar));
+                                        converter.HandleEndOfTrack(metaMessage, midiEvent);
+
+                                        lilypondContent.Append(converter.CurNote.length);
                                         lilypondContent.Append(" ");
 
-                                        percentageOfBarReached += percentageOfBar;
+                                        percentageOfBarReached = converter.percentageOfBarReached;
                                         if (percentageOfBarReached >= 1)
                                         {
                                             lilypondContent.AppendLine("|");
-                                            percentageOfBar = percentageOfBar - 1;
+                                            percentageOfBarReached = -1;
+                                            converter.percentageOfBarReached -= 1;
                                         }
                                     }
                                     break;
@@ -168,25 +179,28 @@ namespace DPA_Musicsheets.Managers
                             {
                                 if(channelMessage.Data2 > 0) // Data2 = loudness
                                 {
-                                    // Append the new note.
-                                    lilypondContent.Append(MidiToLilyHelper.GetLilyNoteName(previousMidiKey, channelMessage.Data1));
-                                    
-                                    previousMidiKey = channelMessage.Data1;
-                                    startedNoteIsClosed = false;
+                                    // Append the new note.                                   
+                                    converter.HandleNoteOn(channelMessage, midiEvent);
+                                    lilypondContent.Append(converter.CurNote.key);
+                                    previousMidiKey = converter.previousMidiKey;
+                                    startedNoteIsClosed = converter.startedNoteIsClosed;
                                 }
                                 else if (!startedNoteIsClosed)
                                 {
                                     // Finish the previous note with the length.
-                                    double percentageOfBar;
-                                    lilypondContent.Append(MidiToLilyHelper.GetLilypondNoteLength(previousNoteAbsoluteTicks, midiEvent.AbsoluteTicks, division, _beatNote, _beatsPerBar, out percentageOfBar));
-                                    previousNoteAbsoluteTicks = midiEvent.AbsoluteTicks;
+                                    converter.HandleNoteOff(channelMessage, midiEvent);
+                                     
+                                    lilypondContent.Append(converter.CurNote.length);
+                                    previousNoteAbsoluteTicks = converter.previousNoteAbsoluteTicks;
                                     lilypondContent.Append(" ");
 
-                                    percentageOfBarReached += percentageOfBar;
+                                    percentageOfBarReached = converter.percentageOfBarReached;
                                     if (percentageOfBarReached >= 1)
                                     {
                                         lilypondContent.AppendLine("|");
-                                        percentageOfBarReached -= 1;
+    
+                                        converter.percentageOfBarReached -= 1;
+                                        percentageOfBarReached = converter.percentageOfBarReached;
                                     }
                                     startedNoteIsClosed = true;
                                 }
