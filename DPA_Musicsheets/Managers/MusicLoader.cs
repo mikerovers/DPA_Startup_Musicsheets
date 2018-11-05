@@ -111,6 +111,7 @@ namespace DPA_Musicsheets.Managers
         {
             FromMidiConverter converter = new FromMidiConverter();
             converter.division = sequence.Division;
+            converter.convert(sequence);
 
             StringBuilder lilypondContent = new StringBuilder();
             lilypondContent.AppendLine("\\relative c' {");

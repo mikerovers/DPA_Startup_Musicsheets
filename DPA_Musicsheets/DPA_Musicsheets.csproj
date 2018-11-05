@@ -103,7 +103,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converter\IMidiMessageConverter.cs" />
+    <Compile Include="Converter\Midi\ChannelMessageConverter.cs" />
     <Compile Include="Converter\Midi\FromMidiConverter.cs" />
+    <Compile Include="Converter\Midi\MetaMessageConverter.cs" />
+    <Compile Include="Converter\Midi\MidiConverterMetaData.cs" />
+    <Compile Include="Converter\Midi\MidiMessageConverterFactory.cs" />
     <Compile Include="Managers\MidiToLilyHelper.cs" />
     <Compile Include="Managers\MusicLoader.cs" />
     <Compile Include="Models\Clef.cs" />
