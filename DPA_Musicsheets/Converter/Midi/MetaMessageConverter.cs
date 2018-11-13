@@ -30,7 +30,10 @@ namespace DPA_Musicsheets.Converter.Midi
                     HandleTempo(metaMessage, midiEvent);
 
                     break;
+                case MetaType.EndOfTrack:
+                    HandleEndOfTrack(metaMessage, midiEvent);
 
+                    break;
             }
         }
 

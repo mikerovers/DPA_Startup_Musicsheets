@@ -8,8 +8,9 @@ namespace DPA_Musicsheets.Models
 {
     public enum ClefType
     {
-        G,
-        C,
-        F
+        g,
+        c,
+        f,
+        treble
     }
 }

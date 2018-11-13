@@ -1,4 +1,6 @@
 ﻿
+using DPA_Musicsheets.Converter;
+using DPA_Musicsheets.Converter.Lilypond;
 using DPA_Musicsheets.Converter.Midi;
 using DPA_Musicsheets.Models;
 using DPA_Musicsheets.ViewModels;
@@ -52,6 +54,24 @@ namespace DPA_Musicsheets.Managers
         /// <param name="fileName"></param>
         public void OpenFile(string fileName)
         {
+            var fromConverterFactory = new FromConverterFactory();
+            var converter = fromConverterFactory.GetConverter(Path.GetExtension(fileName));
+
+            if (converter == null)
+            {
+                throw new NotSupportedException($"File extension {Path.GetExtension(fileName)} is not supported.");
+            }
+
+            Block block = converter.ConvertTo(fileName);
+            var toLilypondConverter = new ToLilypondConverter();
+            string output = toLilypondConverter.ConvertTo(block);
+            this.LilypondText = output;
+            this.LilypondViewModel.LilypondTextLoaded(this.LilypondText);
+
+            LoadLilypondIntoWpfStaffsAndMidi(LilypondText);
+
+            return;
+
             if (Path.GetExtension(fileName).EndsWith(".mid"))
             {
                 MidiSequence = new Sequence();
@@ -111,7 +131,12 @@ namespace DPA_Musicsheets.Managers
         {
             FromMidiConverter converter = new FromMidiConverter();
             converter.division = sequence.Division;
-            converter.convert(sequence);
+            var block = converter.Convert(sequence);
+
+            ToLilypondConverter toLilypondConverter = new ToLilypondConverter();
+            var output = toLilypondConverter.ConvertTo(block);
+
+            return output;
 
             StringBuilder lilypondContent = new StringBuilder();
             lilypondContent.AppendLine("\\relative c' {");

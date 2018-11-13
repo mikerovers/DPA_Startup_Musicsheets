@@ -27,6 +27,9 @@ namespace DPA_Musicsheets.Converter.Midi
             else if (!metaData.startedNoteIsClosed)
             {
                 HandleNoteOff(channelMessage, midiEvent);
+            } else
+            {
+                block.Add(new Rest(Duration.UNKNOWN));  
             }
         }
 
@@ -49,6 +52,12 @@ namespace DPA_Musicsheets.Converter.Midi
             metaData.startedNoteIsClosed = true;
 
             block.Add(metaData.CurNote);
+
+            if (metaData.percentageOfBarReached >= 1)
+            {
+                block.Add(new Bar());
+                metaData.percentageOfBarReached -= 1;
+            }
         }
     }
 }

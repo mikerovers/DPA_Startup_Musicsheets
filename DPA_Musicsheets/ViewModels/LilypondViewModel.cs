@@ -13,6 +13,8 @@ namespace DPA_Musicsheets.ViewModels
 {
     public class LilypondViewModel : ViewModelBase
     {
+        private BlockContainer _blockContainer;
+
         private MusicLoader _musicLoader;
         private MainViewModel _mainViewModel { get; set; }
 
@@ -46,8 +48,9 @@ namespace DPA_Musicsheets.ViewModels
         private static int MILLISECONDS_BEFORE_CHANGE_HANDLED = 1500;
         private bool _waitingForRender = false;
 
-        public LilypondViewModel(MainViewModel mainViewModel, MusicLoader musicLoader)
+        public LilypondViewModel(MainViewModel mainViewModel, MusicLoader musicLoader, BlockContainer blockContainer)
         {
+            _blockContainer = blockContainer;
             // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer and viewmodels don't know each other?
             // And viewmodels don't 
             _mainViewModel = mainViewModel;

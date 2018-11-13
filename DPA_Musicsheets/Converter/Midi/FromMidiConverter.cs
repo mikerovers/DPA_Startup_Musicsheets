@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DPA_Musicsheets.Converter.Midi
 {
-    class FromMidiConverter
+    class FromMidiConverter : IFromConverter
     {
         private Block block;
         private MidiConverterMetaData metaData;
@@ -34,12 +34,42 @@ namespace DPA_Musicsheets.Converter.Midi
             messageConverterFactory = new MidiMessageConverterFactory();
         }
 
-        public Block convert(Sequence sequence)
+        public Block ConvertTo(string fileName)
         {
+            var sequence = new Sequence();
+            sequence.Load(fileName);
             block = new Block();
+            metaData = new MidiConverterMetaData();
             metaData.division = sequence.Division;
             division = sequence.Division;
 
+            block.Add(new Clef(ClefType.treble));
+            for (int i = 0; i < sequence.Count(); i++)
+            {
+                Track track = sequence[i];
+
+                foreach (MidiEvent midiEvent in track.Iterator())
+                {
+                    IMidiMessage midiMessage = midiEvent.MidiMessage;
+                    var converter = messageConverterFactory.GetConverter(midiMessage.MessageType);
+                    if (converter != null)
+                    {
+                        converter.Parse(midiMessage, midiEvent, metaData, block);
+                    }
+                }
+            }
+
+            return block;
+        }
+        public Block Convert(Sequence sequence)
+        {
+            block = new Block();
+            metaData = new MidiConverterMetaData();
+
+            metaData.division = sequence.Division;
+            division = sequence.Division;
+
+            block.Add(new Clef(ClefType.treble));
             for (int i = 0; i < sequence.Count(); i++)
             {
                 Track track = sequence[i];
@@ -79,7 +109,7 @@ namespace DPA_Musicsheets.Converter.Midi
             {
                 HandleNoteOn(message, midiEvent);
             }
-            //else if (!startedNoteIsClosed)
+            else if (!startedNoteIsClosed)
             {
                 HandleNoteOff(message, midiEvent);
             }
@@ -141,6 +171,5 @@ namespace DPA_Musicsheets.Converter.Midi
 
             block.Add(CurNote);
         }
-    
     }
 }

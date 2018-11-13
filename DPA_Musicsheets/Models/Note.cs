@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DPA_Musicsheets.Converter;
 
 namespace DPA_Musicsheets.Models
 {
@@ -26,5 +27,9 @@ namespace DPA_Musicsheets.Models
             this.pitch = pitch;
         }
 
+        public void AcceptLily(LilyVisitor v)
+        {
+            v.Visit(this);
+        }
     }
 }

@@ -103,14 +103,23 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converter\FromConverterFactory.cs" />
+    <Compile Include="Converter\IFromConverter.cs" />
     <Compile Include="Converter\IMidiMessageConverter.cs" />
+    <Compile Include="Converter\IToConverter.cs" />
+    <Compile Include="Converter\Lilypond\FromLilypondConverter.cs" />
+    <Compile Include="Converter\Lilypond\ToLilypondConverter.cs" />
+    <Compile Include="Converter\Lilypond\LilyVisitor.cs" />
     <Compile Include="Converter\Midi\ChannelMessageConverter.cs" />
     <Compile Include="Converter\Midi\FromMidiConverter.cs" />
     <Compile Include="Converter\Midi\MetaMessageConverter.cs" />
     <Compile Include="Converter\Midi\MidiConverterMetaData.cs" />
     <Compile Include="Converter\Midi\MidiMessageConverterFactory.cs" />
+    <Compile Include="Converter\ToConverterFactory.cs" />
+    <Compile Include="Managers\BlockContainer.cs" />
     <Compile Include="Managers\MidiToLilyHelper.cs" />
     <Compile Include="Managers\MusicLoader.cs" />
+    <Compile Include="Models\Bar.cs" />
     <Compile Include="Models\Clef.cs" />
     <Compile Include="Models\ClefType.cs" />
     <Compile Include="Models\Division.cs" />
