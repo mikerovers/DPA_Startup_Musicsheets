@@ -22,6 +22,7 @@ namespace DPA_Musicsheets.Models
         Staff,
         Repeat,
         Alternative,
+        Extend,
         SectionStart,
         SectionEnd
     }
