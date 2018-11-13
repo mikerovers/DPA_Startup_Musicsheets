@@ -12,7 +12,7 @@ namespace DPA_Musicsheets.Models
         public ClefType type;
         public int bar;
 
-        public Clef(ClefType type)
+        public Clef(ClefType type, int bar)
         {
             this.type = type;
             this.bar = bar;

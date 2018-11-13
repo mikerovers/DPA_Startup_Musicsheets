@@ -10,6 +10,14 @@ namespace DPA_Musicsheets.Models
     class Tempo : Token
     {
         public int tempo;
+        public int upper;
+        public int downer;
+
+        public Tempo(int upper, int downer)
+        {
+            this.upper = upper;
+            this.downer = downer;
+        }
 
         public Tempo(int tempo)
         {

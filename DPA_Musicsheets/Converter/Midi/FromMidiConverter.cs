@@ -43,7 +43,7 @@ namespace DPA_Musicsheets.Converter.Midi
             metaData.division = sequence.Division;
             division = sequence.Division;
 
-            block.Add(new Clef(ClefType.treble));
+            block.Add(new Clef(ClefType.treble, 0));
             for (int i = 0; i < sequence.Count(); i++)
             {
                 Track track = sequence[i];
@@ -69,7 +69,7 @@ namespace DPA_Musicsheets.Converter.Midi
             metaData.division = sequence.Division;
             division = sequence.Division;
 
-            block.Add(new Clef(ClefType.treble));
+            block.Add(new Clef(ClefType.treble, 0));
             for (int i = 0; i < sequence.Count(); i++)
             {
                 Track track = sequence[i];

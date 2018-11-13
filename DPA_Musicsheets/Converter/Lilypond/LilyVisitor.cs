@@ -16,6 +16,7 @@ namespace DPA_Musicsheets.Converter
         void Visit(Clef clef);
         void Visit(Rest rest);
         void Visit(Bar bar);
+        void Visit(Repeat repeat);
     }
 
     class ToLilyVisitor : LilyVisitor
@@ -71,6 +72,11 @@ namespace DPA_Musicsheets.Converter
         {
             stringBuilder.Append("|");
             stringBuilder.AppendLine();
+        }
+
+        public void Visit(Repeat repeat)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -19,7 +19,12 @@ namespace DPA_Musicsheets.Converter.Lilypond
             tokens = GetTokensFromLilypond(content);
             DebugTokens(tokens);
 
-            return new Block();
+            var builder = new BlockBuilder();
+            var block = builder.Build(tokens);
+            var toli = new ToLilypondConverter();
+            // var lil = toli.ConvertTo(block);
+
+            return builder.Build(tokens);
         }
 
         private string GetContent(string fileName)
@@ -109,7 +114,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
                     case @"{":
                         return LilypondTokenKind.SectionStart;
                     case @"}":
-                        return LilypondTokenKind.SectionStart;
+                        return LilypondTokenKind.SectionEnd;
                     default:
                         return LilypondTokenKind.Unknown;
                 }
