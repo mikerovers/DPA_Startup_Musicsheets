@@ -19,7 +19,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
             tokens = GetTokensFromLilypond(content);
             DebugTokens(tokens);
 
-            var builder = new BlockBuilder();
+            var builder = new BlockDirector();
             var block = builder.Build(tokens);
             var toli = new ToLilypondConverter();
             // var lil = toli.ConvertTo(block);
@@ -46,7 +46,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
             lilyContent = blankRegex.Replace(lilyContent, " ");
             var tokens = new LinkedList<LilypondToken>();
             var lines = lilyContent.Split(' ').ToList<string>();
-            var tokenFactory = new TokenKindFactory();
+            var tokenFactory = new LilypondTokenizer();
             
             foreach(var line in lines)
             {
@@ -89,7 +89,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
             return LilypondTokenKind.Unknown;
         }
 
-        internal class TokenKindFactory
+        internal class LilypondTokenizer
         {
             public LilypondTokenKind GetToken(string line)
             {

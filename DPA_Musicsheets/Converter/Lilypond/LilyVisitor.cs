@@ -11,6 +11,7 @@ namespace DPA_Musicsheets.Converter
     {
         void Visit(Block block);
         void Visit(TimeSignature timeSignature);
+        void Visit(NullToken nullToken);
         void Visit(Tempo tempo);
         void Visit(Note note);
         void Visit(Clef clef);
@@ -75,6 +76,11 @@ namespace DPA_Musicsheets.Converter
         }
 
         public void Visit(Repeat repeat)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Visit(NullToken nullToken)
         {
             throw new NotImplementedException();
         }

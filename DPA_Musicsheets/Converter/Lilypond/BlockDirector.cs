@@ -3,11 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DPA_Musicsheets.Converter.Lilypond
 {
-    class BlockBuilder
+    class BlockDirector
     {
         private Note NoteToExtend;
         private LinkedListNode<LilypondToken> currentToken;
@@ -17,20 +18,25 @@ namespace DPA_Musicsheets.Converter.Lilypond
             currentToken = tokens.First;
             NoteToExtend = null;
 
-            return newBlock();
+            return ConstructBlock();
         }
 
-        private Block newBlock()
+        private Block ConstructBlock()
         {
-            var block = new Block();
-            currentToken = currentToken.Next;
+            Block block = new Block();
+            var tokenFactory = new TokenBuilderFactory();
+            var builder = new BlockBuilder(tokenFactory);
 
+            return (Block)builder.BuildToken(block, currentToken);
+
+            currentToken = currentToken.Next;
+                        
             while (currentToken != null)
             {
                 switch (currentToken.Value.TokenKind)
                 {
                     case LilypondTokenKind.SectionStart:
-                        block.Add(newBlock());
+                        block.Add(ConstructBlock());
 
                         break;
                     case LilypondTokenKind.SectionEnd:
@@ -96,7 +102,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
                             throw new Exception("Invalid lilypond file at repeat.");
                         }
 
-                        Block nBlock = newBlock();
+                        Block nBlock = ConstructBlock();
                         var repeated = new Repeat(nBlock, repeatAmount);
                         block.Add(repeated);
 
@@ -112,12 +118,21 @@ namespace DPA_Musicsheets.Converter.Lilypond
 
                         if (block.Last() is Repeat repeat)
                         {
-                            repeat.toRepeat = newBlock();
+                            repeat.toRepeat = ConstructBlock();
                         }
                         else
                         {
                             throw new Exception("Invalid Lilypond file.");
                         }
+
+                        break;
+                    case LilypondTokenKind.Note:
+
+                        var newNote = new Note();
+                        newNote.length = HandleLength(currentToken.Value.Value);
+                        newNote.key = HandleKey(currentToken.Value.Value);
+                        newNote.pitch = HandlePitch(currentToken.Value.Value);
+                        block.Add(newNote);
 
                         break;
                 }
@@ -132,6 +147,41 @@ namespace DPA_Musicsheets.Converter.Lilypond
             }
 
             return block;
+        }
+
+        private string HandleLength(string value)
+        {
+            // Retreive the base lenght of the note.
+            var length = float.Parse(Regex.Match(value, @"[0-9]+").Value);
+            // Retreive the amount of dots used in the note.
+            var dotAmount = value.Count(i => i.Equals('.'));
+
+            return "" + (1 / length) * (2 - 1 / Math.Pow(2, dotAmount));
+        }
+        
+        private Key HandleKey(string value)
+        {
+            var val = Regex.Matches(value, "is").Count - Regex.Matches(value, "es").Count;
+            KeyType key;
+
+            if (val < 0)
+            {
+                key = KeyType.FLAT;
+            } else if (val > 0)
+            {
+                key = KeyType.SHARP;
+            } else
+            {
+                key = KeyType.NORM;
+            }
+
+            return new Key(key, 0);
+        }
+
+        private Pitch HandlePitch(string value)
+        {
+            // Pitch is in first character.
+            return (Pitch)Enum.Parse(typeof(Pitch), value[0].ToString().ToUpper());
         }
     }
 }

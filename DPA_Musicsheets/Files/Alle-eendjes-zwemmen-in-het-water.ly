@@ -22,7 +22,6 @@
     g4 g4 a4 a4 |
     d8 e8 d8 c8 b4 a4 |
     e2 fis2
-
   }
   \alternative {
     { g8 b8 d8 b8 g2 }

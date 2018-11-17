@@ -8,6 +8,13 @@ namespace DPA_Musicsheets.Models
 {
     class Key
     {
+        public KeyType keyType;
+        public int length;
 
+        public Key(KeyType type, int length)
+        {
+            keyType = type;
+            this.length = length;
+        }
     }
 }

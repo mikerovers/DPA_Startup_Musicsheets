@@ -105,7 +105,8 @@
     </ApplicationDefinition>
     <Compile Include="Converter\FromConverterFactory.cs" />
     <Compile Include="Converter\IFromConverter.cs" />
-    <Compile Include="Converter\Lilypond\BlockBuilder.cs" />
+    <Compile Include="Converter\Lilypond\BlockDirector.cs" />
+    <Compile Include="Converter\Lilypond\TokenBuilder.cs" />
     <Compile Include="Converter\Midi\IMidiMessageConverter.cs" />
     <Compile Include="Converter\IToConverter.cs" />
     <Compile Include="Converter\Lilypond\FromLilypondConverter.cs" />
@@ -130,6 +131,7 @@
     <Compile Include="Models\LilypondToken.cs" />
     <Compile Include="Models\LilypondTokenKind.cs" />
     <Compile Include="Models\Note.cs" />
+    <Compile Include="Models\NullToken.cs" />
     <Compile Include="Models\Pitch.cs" />
     <Compile Include="Models\Repeat.cs" />
     <Compile Include="Models\Rest.cs" />

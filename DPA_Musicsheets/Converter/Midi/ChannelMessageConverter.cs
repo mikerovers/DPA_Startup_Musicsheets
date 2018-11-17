@@ -36,7 +36,8 @@ namespace DPA_Musicsheets.Converter.Midi
         public void HandleNoteOn(ChannelMessage channelMessage, MidiEvent e)
         {
             metaData.CurNote = new Note();
-            metaData.CurNote.key = MidiToLilyHelper.GetLilyNoteName(metaData.previousMidiKey, channelMessage.Data1);
+            // TODO Change key to domain model
+            // metaData.CurNote.key = MidiToLilyHelper.GetLilyNoteName(metaData.previousMidiKey, channelMessage.Data1);
             metaData.previousMidiKey = channelMessage.Data1;
             metaData.startedNoteIsClosed = false;
         }

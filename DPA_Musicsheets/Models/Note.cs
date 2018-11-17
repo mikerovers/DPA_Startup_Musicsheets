@@ -11,7 +11,7 @@ namespace DPA_Musicsheets.Models
     {
         public Pitch pitch;
         public int octave;
-        public string key;
+        public Key key;
         public string length;
 
         public Note()
@@ -19,7 +19,7 @@ namespace DPA_Musicsheets.Models
 
         }
 
-        public Note(Pitch pitch, int octave, string length, string key)
+        public Note(Pitch pitch, int octave, string length, Key key)
         {
             this.length = length;
             this.key = key;

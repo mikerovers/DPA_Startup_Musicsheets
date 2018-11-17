@@ -154,7 +154,8 @@ namespace DPA_Musicsheets.Converter.Midi
         public void HandleNoteOn(ChannelMessage channelMessage, MidiEvent e)
         {
             CurNote = new Note();
-            CurNote.key = MidiToLilyHelper.GetLilyNoteName(previousMidiKey, channelMessage.Data1);
+            // TODO Change to key domain
+            //CurNote.key = MidiToLilyHelper.GetLilyNoteName(previousMidiKey, channelMessage.Data1);
             previousMidiKey = channelMessage.Data1;
             startedNoteIsClosed = false;
         }
