@@ -1,4 +1,4 @@
-﻿using DPA_Musicsheets.Models;
+﻿using DPA_Musicsheets.Models;   
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
 {
     interface ITokenBuilder
     {
-        Token BuildToken(Block block, LinkedListNode<LilypondToken> currentToken);
+        Token BuildToken(Block block, Queue<LilypondToken> currentToken);
     }
 
     abstract class TokenBuilder : ITokenBuilder
@@ -19,18 +19,19 @@ namespace DPA_Musicsheets.Converter.Lilypond
 
         public TokenBuilder(TokenBuilderFactory builderFactory) => this.builderFactory = builderFactory;
 
-        public abstract Token BuildToken(Block block, LinkedListNode<LilypondToken> currentToken);
-        protected Block CreateBlock(LinkedListNode<LilypondToken> currentToken)
+        public abstract Token BuildToken(Block block, Queue<LilypondToken> currentToken);
+        protected Block CreateBlock(Queue<LilypondToken> currentToken)
         {
             var block = new Block();
-            currentToken = currentToken.Next;
-                
-            while (currentToken != null && currentToken.Value.TokenKind != LilypondTokenKind.SectionEnd)
+            currentToken.Dequeue();
+
+            while (currentToken.Count > 0 && currentToken.Peek().TokenKind != LilypondTokenKind.SectionEnd)
             {
-                var token = builderFactory.GetBuilder(currentToken.Value.TokenKind).BuildToken(block, currentToken);
+                var token = builderFactory.GetBuilder(currentToken.Peek().TokenKind).BuildToken(block, currentToken);
                 block.Add(token);
 
-                currentToken = currentToken.Next;
+                if (currentToken.Count > 0 )
+                    currentToken.Dequeue();
             }
 
             return block;
@@ -43,7 +44,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, LinkedListNode<LilypondToken> currentToken)
+        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
             return CreateBlock(currentToken);
         }
@@ -55,10 +56,10 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, LinkedListNode<LilypondToken> currentToken)
+        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
-            currentToken = currentToken.Next;
-            switch (currentToken.Value.Value)
+            currentToken.Dequeue();
+            switch (currentToken.Peek().Value)
             {
                 case "treble":
                 case "g":
@@ -81,10 +82,10 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, LinkedListNode<LilypondToken> currentToken)
+        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
-            currentToken = currentToken.Next;
-            string[] timeData = currentToken.Value.Value.Split('/');
+            currentToken.Dequeue();
+            string[] timeData = currentToken.Peek().Value.Split('/');
             return new TimeSignature(int.Parse(timeData[0]), int.Parse(timeData[1]));
         }
     }
@@ -95,10 +96,10 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, LinkedListNode<LilypondToken> currentToken)
+        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
-            currentToken = currentToken.Next;
-            string[] tempoData = currentToken.Value.Value.Split('=');
+            currentToken.Dequeue();
+            string[] tempoData = currentToken.Peek().Value.Split('=');
             return new Tempo(int.Parse(tempoData[0]), int.Parse(tempoData[1]));
         }
     }
@@ -109,19 +110,19 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, LinkedListNode<LilypondToken> currentToken)
+        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
-            currentToken = currentToken.Next;
-            if (currentToken.Value.Value != "volta")
+            currentToken.Dequeue();
+            if (currentToken.Peek().Value != "volta")
             {
                 throw new Exception("Invalid lilypond file.");
             }
 
-            currentToken = currentToken.Next;
-            int repeatAmount = int.Parse(currentToken.Value.Value);
-            currentToken = currentToken.Next;
+            currentToken.Dequeue();
+            int repeatAmount = int.Parse(currentToken.Peek().Value);
+            currentToken.Dequeue();
 
-            if (currentToken.Value.Value != "{")
+            if (currentToken.Peek().Value != "{")
             {
                 throw new Exception("Invalid lilypond file at repeat.");
             }
@@ -139,10 +140,10 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, LinkedListNode<LilypondToken> currentToken)
+        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
-            currentToken = currentToken.Next;
-            if (currentToken.Value.Value != "{")
+            currentToken.Dequeue();
+            if (currentToken.Peek().Value != "{")
             {
                 throw new Exception("Invalid Lilypond file.");
             }
@@ -166,13 +167,13 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, LinkedListNode<LilypondToken> currentToken)
+        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
             var newNote = new Note();
-            newNote.length = HandleLength(currentToken.Value.Value);
-            newNote.key = HandleKey(currentToken.Value.Value);
-            newNote.pitch = HandlePitch(currentToken.Value.Value);
-            newNote.octave = HandleOctave(newNote.pitch, currentToken.Value.Value);
+            newNote.length = HandleLength(currentToken.Peek().Value);
+            newNote.key = HandleKey(currentToken.Peek().Value);
+            newNote.pitch = HandlePitch(currentToken.Peek().Value);
+            newNote.octave = HandleOctave(newNote.pitch, currentToken.Peek().Value);
 
             return newNote;
         }
@@ -245,7 +246,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, LinkedListNode<LilypondToken> currentToken)
+        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
             return new Bar();
         }
@@ -257,7 +258,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, LinkedListNode<LilypondToken> currentToken)
+        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
             return new NullToken();
         }
@@ -269,7 +270,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, LinkedListNode<LilypondToken> currentToken)
+        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
             return CreateBlock(currentToken);
         }
@@ -281,7 +282,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, LinkedListNode<LilypondToken> currentToken)
+        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
             return block;
         }
@@ -293,9 +294,9 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, LinkedListNode<LilypondToken> currentToken)
+        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
-            return new Rest(HandleLength(currentToken.Value.Value));
+            return new Rest(HandleLength(currentToken.Peek().Value));
         }
 
         private string HandleLength(string value)

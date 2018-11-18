@@ -36,6 +36,7 @@ namespace DPA_Musicsheets.Converter
                 this.Visit(token as dynamic);
             }
             stringBuilder.Append("}");
+            stringBuilder.AppendLine();
         }
 
         public void Visit(TimeSignature timeSignature)
@@ -67,6 +68,7 @@ namespace DPA_Musicsheets.Converter
         public void Visit(Rest rest)
         {
             stringBuilder.Append($"r{rest.Duration}");
+            stringBuilder.AppendLine();
         }
 
         public void Visit(Bar bar)
@@ -77,8 +79,9 @@ namespace DPA_Musicsheets.Converter
 
         public void Visit(Repeat repeat)
         {
-            stringBuilder.Append($@"\repeat volta {repeat.repeat}");
+            stringBuilder.Append($@"\repeat volta {repeat.repeat} ");
             stringBuilder.Append("{");
+            stringBuilder.AppendLine();
             Visit(repeat.block);
             if (repeat.toRepeat.Count() > 0)
             {
@@ -88,6 +91,7 @@ namespace DPA_Musicsheets.Converter
                     Visit(token as dynamic);
                 }
                 stringBuilder.Append(@"}");
+                stringBuilder.AppendLine();
             }
         }
 

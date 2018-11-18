@@ -31,7 +31,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
 
             Queue<LilypondToken> queue = new Queue<LilypondToken>(tokens);
 
-            return (Block)builder.BuildToken(block, currentToken);
+            return (Block)builder.BuildToken(block, queue);
 
             currentToken = currentToken.Next;
                         
