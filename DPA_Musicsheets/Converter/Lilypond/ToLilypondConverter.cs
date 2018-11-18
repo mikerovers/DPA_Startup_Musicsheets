@@ -18,6 +18,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
 
         public string ConvertTo(Block block)
         {
+            stringBuilder.AppendLine(@"\relative c' {");
             var lilyVisitor = new ToLilyVisitor(stringBuilder);
             lilyVisitor.Visit(block);
 

@@ -29,7 +29,7 @@ namespace DPA_Musicsheets.Converter.Midi
                 HandleNoteOff(channelMessage, midiEvent);
             } else
             {
-                block.Add(new Rest(Duration.UNKNOWN));  
+                block.Add(new Rest(""));  
             }
         }
 

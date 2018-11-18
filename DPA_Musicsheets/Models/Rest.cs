@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,12 +10,14 @@ namespace DPA_Musicsheets.Models
 {
     class Rest: Token
     {
-        public Duration duration;
+        public string duration;
 
-        public Rest(Duration duration)
+        public Rest(string duration)
         {
             this.duration = duration;
         }
+
+        public int Duration => (int)(1 / float.Parse(duration));
 
         public void AcceptLily(LilyVisitor v)
         {

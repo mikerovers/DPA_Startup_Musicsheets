@@ -19,12 +19,10 @@ namespace DPA_Musicsheets.Converter.Lilypond
             tokens = GetTokensFromLilypond(content);
             DebugTokens(tokens);
 
-            var builder = new BlockDirector();
-            var block = builder.Build(tokens);
-            var toli = new ToLilypondConverter();
-            // var lil = toli.ConvertTo(block);
+            var director = new BlockDirector();
+            var block = director.Build(tokens);
 
-            return builder.Build(tokens);
+            return (Block)block;
         }
 
         private string GetContent(string fileName)

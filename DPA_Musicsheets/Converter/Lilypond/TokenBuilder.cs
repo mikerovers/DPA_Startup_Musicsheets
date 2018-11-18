@@ -24,25 +24,13 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
             var block = new Block();
             currentToken = currentToken.Next;
-
-            while (currentToken != null)
+                
+            while (currentToken != null && currentToken.Value.TokenKind != LilypondTokenKind.SectionEnd)
             {
-
-                if (currentToken.Value.TokenKind == LilypondTokenKind.SectionEnd)
-                {
-                    return block;
-                }
                 var token = builderFactory.GetBuilder(currentToken.Value.TokenKind).BuildToken(block, currentToken);
                 block.Add(token);
 
-                if (currentToken != null && currentToken.Next != null)
-                {
-                    currentToken = currentToken.Next;
-                }
-                else
-                {
-                    currentToken = null;
-                }
+                currentToken = currentToken.Next;
             }
 
             return block;
@@ -74,7 +62,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
             {
                 case "treble":
                 case "g":
-                    return new Clef(ClefType.g, 2);
+                    return new Clef(ClefType.treble, 2);
                 case "alto":
                 case "c":
                     return new Clef(ClefType.c, 3);
@@ -140,7 +128,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
 
             Block nBlock = CreateBlock(currentToken);
             var repeated = new Repeat(nBlock, repeatAmount);
-
+            
             return repeated;
         }
     }
@@ -184,8 +172,26 @@ namespace DPA_Musicsheets.Converter.Lilypond
             newNote.length = HandleLength(currentToken.Value.Value);
             newNote.key = HandleKey(currentToken.Value.Value);
             newNote.pitch = HandlePitch(currentToken.Value.Value);
+            newNote.octave = HandleOctave(newNote.pitch, currentToken.Value.Value);
 
             return newNote;
+        }
+
+        private int HandleOctave(Pitch pitch, string value)
+        {
+            int val = Regex.Matches(value, ",").Count;
+            if (val > 0)
+            {
+                return 1;
+            }
+
+            val = Regex.Matches(value, "'").Count;
+            if (val > 0)
+            {
+                return -1;
+            }
+
+            return 0;
         }
 
         private string HandleLength(string value)
@@ -221,8 +227,15 @@ namespace DPA_Musicsheets.Converter.Lilypond
 
         private Pitch HandlePitch(string value)
         {
-            // Pitch is in first character.
-            return (Pitch)Enum.Parse(typeof(Pitch), value[0].ToString().ToUpper());
+            int index;
+            if (value[0] == '~')
+            {
+                index = 1;
+            } else
+            {
+                index = 0;
+            }
+            return (Pitch)Enum.Parse(typeof(Pitch), value[index].ToString().ToUpper());
         }
     }
 
@@ -274,6 +287,28 @@ namespace DPA_Musicsheets.Converter.Lilypond
         }
     }
 
+    class RestBuilder : TokenBuilder
+    {
+        public RestBuilder(TokenBuilderFactory builderFactory) : base(builderFactory)
+        {
+        }
+
+        public override Token BuildToken(Block block, LinkedListNode<LilypondToken> currentToken)
+        {
+            return new Rest(HandleLength(currentToken.Value.Value));
+        }
+
+        private string HandleLength(string value)
+        {
+            // Retreive the base lenght of the note.
+            var length = float.Parse(Regex.Match(value, @"[0-9]+").Value);
+            // Retreive the amount of dots used in the note.
+            var dotAmount = value.Count(i => i.Equals('.'));
+
+            return "" + (1 / length) * (2 - 1 / Math.Pow(2, dotAmount));
+        }
+    }
+
     class TokenBuilderFactory
     {
         private Dictionary<LilypondTokenKind, TokenBuilder> builders;
@@ -291,6 +326,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
             builders.Add(LilypondTokenKind.Note, new NoteBuilder(this));
             builders.Add(LilypondTokenKind.SectionStart, new SectionStartBuilder(this));
             builders.Add(LilypondTokenKind.SectionEnd, new SectionEndBuilder(this));
+            builders.Add(LilypondTokenKind.Rest, new RestBuilder(this));
             builders.Add(LilypondTokenKind.Unknown, new NullBuilder(this));
         }
 

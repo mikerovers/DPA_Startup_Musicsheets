@@ -12,11 +12,13 @@ namespace DPA_Musicsheets.Converter.Lilypond
     {
         private Note NoteToExtend;
         private LinkedListNode<LilypondToken> currentToken;
+        private LinkedList<LilypondToken> tokens;
 
         public Block Build(LinkedList<LilypondToken> tokens)
         {
             currentToken = tokens.First;
             NoteToExtend = null;
+            this.tokens = tokens;
 
             return ConstructBlock();
         }
@@ -26,6 +28,8 @@ namespace DPA_Musicsheets.Converter.Lilypond
             Block block = new Block();
             var tokenFactory = new TokenBuilderFactory();
             var builder = new BlockBuilder(tokenFactory);
+
+            Queue<LilypondToken> queue = new Queue<LilypondToken>(tokens);
 
             return (Block)builder.BuildToken(block, currentToken);
 

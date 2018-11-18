@@ -31,5 +31,21 @@ namespace DPA_Musicsheets.Models
         {
             v.Visit(this);
         }
+
+        public int Length => (int) (1 / float.Parse(length));
+
+        public string OctaveString()
+        {
+            if (octave > 0)
+            {
+                return $",";
+            } else if (octave < 0)
+            {
+                return $"'";
+            } else
+            {
+                return "";
+            }
+        }
     }
 }

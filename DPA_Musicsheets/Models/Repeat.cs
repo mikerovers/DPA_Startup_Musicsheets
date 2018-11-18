@@ -13,7 +13,14 @@ namespace DPA_Musicsheets.Models
         public int repeat;
         public Block toRepeat;
 
-        public Repeat(Block block, int repeat, Block toRepeat = default(Block))
+        public Repeat(Block block, int repeat)
+        {
+            this.block = block;
+            this.repeat = repeat;
+            this.toRepeat = new Block();
+        }
+
+        public Repeat(Block block, int repeat, Block toRepeat)
         {
             this.block = block;
             this.repeat = repeat;

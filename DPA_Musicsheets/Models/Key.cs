@@ -16,5 +16,19 @@ namespace DPA_Musicsheets.Models
             keyType = type;
             this.length = length;
         }
+
+        public string KeyString()
+        {
+            if (keyType == KeyType.FLAT)
+            {
+                return "es"; 
+            } else if (keyType == KeyType.SHARP)
+            {
+                return "is";
+            } else
+            {
+                return "";
+            }
+        }
     }
 }

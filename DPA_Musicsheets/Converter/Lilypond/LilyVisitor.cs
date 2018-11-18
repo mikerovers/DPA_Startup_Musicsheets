@@ -31,11 +31,9 @@ namespace DPA_Musicsheets.Converter
 
         public void Visit(Block block)
         {
-            stringBuilder.Append("\\relative c' {");
-            stringBuilder.AppendLine();
             foreach (var token in block)
             {
-                token.AcceptLily(this);    
+                this.Visit(token as dynamic);
             }
             stringBuilder.Append("}");
         }
@@ -48,25 +46,27 @@ namespace DPA_Musicsheets.Converter
 
         public void Visit(Tempo tempo)
         {
-            stringBuilder.Append($@"\tempo 4={60000000 / tempo.tempo}");
+            stringBuilder.Append($@"\tempo {tempo.upper}={tempo.downer}");
             stringBuilder.AppendLine();
         }
 
         public void Visit(Note note)
         {
-            stringBuilder.Append($"{note.key}{note.length}");
+            var key = note.key.KeyString();
+            var octave = note.OctaveString();
+            var pitch = note.pitch.ToString().ToLower();
+            stringBuilder.Append($"{pitch}{key}{octave}{note.Length}");
             stringBuilder.Append(" ");
         }
 
         public void Visit(Clef clef)
         {
-            stringBuilder.Append($@"\clef {clef.type}");
-            stringBuilder.AppendLine();
+            stringBuilder.AppendLine($@"\clef {clef.type}");
         }
 
         public void Visit(Rest rest)
         {
-            stringBuilder.Append("r");
+            stringBuilder.Append($"r{rest.Duration}");
         }
 
         public void Visit(Bar bar)
@@ -77,12 +77,23 @@ namespace DPA_Musicsheets.Converter
 
         public void Visit(Repeat repeat)
         {
-            throw new NotImplementedException();
+            stringBuilder.Append($@"\repeat volta {repeat.repeat}");
+            stringBuilder.Append("{");
+            Visit(repeat.block);
+            if (repeat.toRepeat.Count() > 0)
+            {
+                stringBuilder.Append($@"\alternative {{");
+                foreach(Token token in repeat.toRepeat)
+                {
+                    Visit(token as dynamic);
+                }
+                stringBuilder.Append(@"}");
+            }
         }
 
         public void Visit(NullToken nullToken)
         {
-            throw new NotImplementedException();
+            // Do nothing :)
         }
     }
 }
