@@ -36,25 +36,6 @@ namespace DPA_Musicsheets.Managers
             }
         }
 
-        private string _text;
-        public string Text
-        {
-            get { return _text; }
-            set
-            {
-                if (block != null && !IsRedoingOrUndoing)
-                {
-                    undo.Push(block);
-                    redo.Clear();
-                }
-
-                _text = value;
-                TextChanged.Invoke(this, new TextChangedEventArgs() { _text = value });
-                state = new TextEditedState(this);
-                IsRedoingOrUndoing = false;
-            }
-        }
-
         public TextEditState state;
 
         public event EventHandler<TextChangedEventArgs> TextChanged;
