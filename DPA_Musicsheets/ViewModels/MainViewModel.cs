@@ -1,4 +1,5 @@
-﻿using DPA_Musicsheets.Managers;
+﻿using DPA_Musicsheets.Chain;
+using DPA_Musicsheets.Managers;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Win32;
@@ -16,6 +17,10 @@ namespace DPA_Musicsheets.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {
+        private BlockContainer _blockContainer;
+        private ChainOfResponsibility _chainOfResponsibility;
+        private System.Collections.Generic.List<System.Windows.Input.Key> _keysDown;
+
         private string _fileName;
         public string FileName
         {
@@ -27,6 +32,18 @@ namespace DPA_Musicsheets.ViewModels
             {
                 _fileName = value;
                 RaisePropertyChanged(() => FileName);
+            }
+        }
+
+        public int CarrotPosition
+        {
+            get
+            {
+                return _blockContainer.CarotIndex;
+            }
+            set
+            {
+                _blockContainer.CarotIndex = value;
             }
         }
 
@@ -43,11 +60,16 @@ namespace DPA_Musicsheets.ViewModels
 
         private MusicLoader _musicLoader;
 
-        public MainViewModel(MusicLoader musicLoader)
+        public MainViewModel(MusicLoader musicLoader, BlockContainer blockContainer)
         {
             // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer?
             _musicLoader = musicLoader;
             FileName = @"Files/Alle-eendjes-zwemmen-in-het-water.mid";
+            _blockContainer = blockContainer;
+            _blockContainer.CarotIndex = 0;
+            _chainOfResponsibility = new ChainOfResponsibility();
+            _chainOfResponsibility.AddHandlerToChain(new TimeSignatureHandler());
+            _keysDown = new System.Collections.Generic.List<Key>();
         }
 
         public ICommand OpenFileCommand => new RelayCommand(() =>
@@ -73,17 +95,27 @@ namespace DPA_Musicsheets.ViewModels
         public ICommand OnKeyDownCommand => new RelayCommand<KeyEventArgs>((e) =>
         {
             Console.WriteLine($"Key down: {e.Key}");
+            _keysDown.Add(e.Key);
+            if (_chainOfResponsibility.Handle(_keysDown, _blockContainer) != null)
+            {
+                e.Handled = true;
+                _keysDown.Clear();
+            }
         });
 
-        public ICommand OnKeyUpCommand => new RelayCommand(() =>
+        public ICommand OnKeyUpCommand => new RelayCommand<KeyEventArgs> ((e) =>
         {
             Console.WriteLine("Key Up");
+            _keysDown.Remove(e.Key);
         });
 
         public ICommand OnWindowClosingCommand => new RelayCommand(() =>
         {
+            _blockContainer.state.Exit();
+
             ViewModelLocator.Cleanup();
         });
         #endregion Focus and key commands, these can be used for implementing hotkeys
     }
 }
+    

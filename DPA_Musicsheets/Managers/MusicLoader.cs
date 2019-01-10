@@ -62,7 +62,7 @@ namespace DPA_Musicsheets.Managers
                 throw new NotSupportedException($"File extension {Path.GetExtension(fileName)} is not supported.");
             }
 
-            Block block = converter.ConvertTo(fileName);
+            Block block = converter.ConvertToFromFile(fileName);
             var toLilypondConverter = new ToLilypondConverter();
             string output = toLilypondConverter.ConvertTo(block);
             this.LilypondText = output;
@@ -71,33 +71,6 @@ namespace DPA_Musicsheets.Managers
             LoadLilypondIntoWpfStaffsAndMidi(LilypondText);
 
             return;
-
-            if (Path.GetExtension(fileName).EndsWith(".mid"))
-            {
-                MidiSequence = new Sequence();
-                MidiSequence.Load(fileName);
-
-                MidiPlayerViewModel.MidiSequence = MidiSequence;
-                this.LilypondText = LoadMidiIntoLilypond(MidiSequence);
-                this.LilypondViewModel.LilypondTextLoaded(this.LilypondText);
-            }
-            else if (Path.GetExtension(fileName).EndsWith(".ly"))
-            {
-                StringBuilder sb = new StringBuilder();
-                foreach (var line in File.ReadAllLines(fileName))
-                {
-                    sb.AppendLine(line);
-                }
-                
-                this.LilypondText = sb.ToString();
-                this.LilypondViewModel.LilypondTextLoaded(this.LilypondText);
-            }
-            else
-            {
-                throw new NotSupportedException($"File extension {Path.GetExtension(fileName)} is not supported.");
-            }
-
-            LoadLilypondIntoWpfStaffsAndMidi(LilypondText);
         }
 
         /// <summary>
@@ -130,119 +103,12 @@ namespace DPA_Musicsheets.Managers
         public string LoadMidiIntoLilypond(Sequence sequence)
         {
             FromMidiConverter converter = new FromMidiConverter();
-            converter.division = sequence.Division;
-            var block = converter.Convert(sequence);
+            var block = converter.ConvertTo(sequence);
 
             ToLilypondConverter toLilypondConverter = new ToLilypondConverter();
             var output = toLilypondConverter.ConvertTo(block);
 
-            return output;
-
-            StringBuilder lilypondContent = new StringBuilder();
-            lilypondContent.AppendLine("\\relative c' {");
-            lilypondContent.AppendLine("\\clef treble");
-
-            int division = sequence.Division;
-            int previousMidiKey = 60; // Central C;
-            int previousNoteAbsoluteTicks = 0;
-            double percentageOfBarReached = 0;
-            bool startedNoteIsClosed = true;
-
-            for (int i = 0; i < sequence.Count(); i++)
-            {
-                Track track = sequence[i];
-
-                foreach (var midiEvent in track.Iterator())
-                {
-                    IMidiMessage midiMessage = midiEvent.MidiMessage;
-                    // TODO: Split this switch statements and create separate logic.
-                    // We want to split this so that we can expand our functionality later with new keywords for example.
-                    // Hint: Command pattern? Strategies? Factory method?
-                    switch (midiMessage.MessageType)
-                    {
-                        case MessageType.Meta:
-                            var metaMessage = midiMessage as MetaMessage;
-                            switch (metaMessage.MetaType)
-                            {
-                                case MetaType.TimeSignature:
-                                    var ts = converter.HandleTimeSignature(metaMessage, midiEvent);
-                                    _beatNote = converter._beatNote;
-                                    _beatsPerBar = converter._beatsPerBar;
-                                    _bpm = converter._bpm;
-
-                                    lilypondContent.AppendLine($"\\time {ts.before}/{ts.after}");
-                                    break;
-                                case MetaType.Tempo:
-                                    var tm = converter.HandleTempo(metaMessage, midiEvent);
-                                    _bpm = 60000000 / tm.tempo;
-
-                                    lilypondContent.AppendLine($"\\tempo 4={_bpm}");
-                                    break;
-                                case MetaType.EndOfTrack:
-                                    if (previousNoteAbsoluteTicks > 0)
-                                    {
-                                        // Finish the last notelength.
-                                        converter.HandleEndOfTrack(metaMessage, midiEvent);
-
-                                        lilypondContent.Append(converter.CurNote.length);
-                                        lilypondContent.Append(" ");
-
-                                        percentageOfBarReached = converter.percentageOfBarReached;
-                                        if (percentageOfBarReached >= 1)
-                                        {
-                                            lilypondContent.AppendLine("|");
-                                            percentageOfBarReached = -1;
-                                            converter.percentageOfBarReached -= 1;
-                                        }
-                                    }
-                                    break;
-                                default: break;
-                            }
-                            break;
-                        case MessageType.Channel:
-                            var channelMessage = midiEvent.MidiMessage as ChannelMessage;
-                            if (channelMessage.Command == ChannelCommand.NoteOn)
-                            {
-                                if(channelMessage.Data2 > 0) // Data2 = loudness
-                                {
-                                    // Append the new note.                                   
-                                    converter.HandleNoteOn(channelMessage, midiEvent);
-                                    lilypondContent.Append(converter.CurNote.key);
-                                    previousMidiKey = converter.previousMidiKey;
-                                    startedNoteIsClosed = converter.startedNoteIsClosed;
-                                }
-                                else if (!startedNoteIsClosed)
-                                {
-                                    // Finish the previous note with the length.
-                                    converter.HandleNoteOff(channelMessage, midiEvent);
-                                     
-                                    lilypondContent.Append(converter.CurNote.length);
-                                    previousNoteAbsoluteTicks = converter.previousNoteAbsoluteTicks;
-                                    lilypondContent.Append(" ");
-
-                                    percentageOfBarReached = converter.percentageOfBarReached;
-                                    if (percentageOfBarReached >= 1)
-                                    {
-                                        lilypondContent.AppendLine("|");
-    
-                                        converter.percentageOfBarReached -= 1;
-                                        percentageOfBarReached = converter.percentageOfBarReached;
-                                    }
-                                    startedNoteIsClosed = true;
-                                }
-                                else
-                                {
-                                    lilypondContent.Append("r");
-                                }
-                            }
-                            break;
-                    }
-                }
-            }
-
-            lilypondContent.Append("}");
-
-            return lilypondContent.ToString();
+            return output;  
         }
 
         #endregion Midiloading (loads midi to lilypond)

@@ -1,4 +1,5 @@
 ﻿using DPA_Musicsheets.Converter;
+using DPA_Musicsheets.Converter.Midi;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DPA_Musicsheets.Models
 {
-    interface Token
+    public interface Token
     {
         void AcceptLily(LilyVisitor v);
     }

@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DPA_Musicsheets.Converter;
+using DPA_Musicsheets.Converter.Midi;
 
 namespace DPA_Musicsheets.Models
 {
-    class Clef : Token
+    public class Clef : Token
     {
         public ClefType type;
         public int bar;

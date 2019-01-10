@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DPA_Musicsheets.Converter;
+using DPA_Musicsheets.Converter.Midi;
 
 namespace DPA_Musicsheets.Models
 {
-    class Bar : Token
+    public class Bar : Token
     {
         public void AcceptLily(LilyVisitor v)
         {

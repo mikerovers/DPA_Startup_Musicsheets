@@ -38,13 +38,37 @@ namespace DPA_Musicsheets.Converter.Midi
             metaData.CurNote = new Note();
             // TODO Change key to domain model
             // metaData.CurNote.key = MidiToLilyHelper.GetLilyNoteName(metaData.previousMidiKey, channelMessage.Data1);
+            metaData.CurNote.key = GetKey(channelMessage, metaData.previousMidiKey);
             metaData.previousMidiKey = channelMessage.Data1;
             metaData.startedNoteIsClosed = false;
+        }
+
+        private Key GetKey(ChannelMessage channelMessage, int previousMidiKey)
+        {
+            var midiKey = channelMessage.Data1;
+            var rest = midiKey % 12;
+            Key key;
+            if (rest > 4)
+            {
+                rest = rest - 5;
+            }
+
+            if (rest % 2 == 0)
+            {
+                key = new Key(KeyType.NORM, 1);
+            }
+            else
+            {
+                key = new Key(KeyType.SHARP, 1);
+            }
+
+            return key;
         }
 
         public void HandleNoteOff(ChannelMessage channelMessage, MidiEvent e)
         {
             double percentageOfBar;
+
             string length = MidiToLilyHelper.GetLilypondNoteLength(metaData.previousNoteAbsoluteTicks, e.AbsoluteTicks, metaData.division, metaData._beatNote, metaData._beatsPerBar, out percentageOfBar);
             metaData.CurNote.length = length;
 

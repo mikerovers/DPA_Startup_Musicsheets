@@ -7,22 +7,24 @@ using System.Threading.Tasks;
 
 namespace DPA_Musicsheets.Converter.Lilypond
 {
-    class ToLilypondConverter : IToConverter<string>
+    public class ToLilypondConverter : IToConverter<string>
     {
-        private StringBuilder stringBuilder;
+        private StringBuilder _stringBuilder;
 
         public ToLilypondConverter()
         {
-            stringBuilder = new StringBuilder();
+            _stringBuilder = new StringBuilder();
         }
 
         public string ConvertTo(Block block)
         {
-            stringBuilder.AppendLine(@"\relative c' {");
-            var lilyVisitor = new ToLilyVisitor(stringBuilder);
+            _stringBuilder.Clear();
+            _stringBuilder.AppendLine(@"\relative c' {");
+            var lilyVisitor = new ToLilyVisitor(_stringBuilder);
             lilyVisitor.Visit(block);
+            _stringBuilder.Append("}");
 
-            return stringBuilder.ToString();
+            return _stringBuilder.ToString();
         }
     }
 }

@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DPA_Musicsheets.Converter;
+using DPA_Musicsheets.Converter.Midi;
 
 namespace DPA_Musicsheets.Models
 {
-    class Repeat : Token
+    public class Repeat : Token
     {
         public Block block;
         public int repeat;

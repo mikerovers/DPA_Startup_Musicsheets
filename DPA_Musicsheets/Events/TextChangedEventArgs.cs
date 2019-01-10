@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DPA_Musicsheets.Converter
+namespace DPA_Musicsheets.Events
 {
-    public interface IToConverter<out T>
+    public class TextChangedEventArgs : EventArgs
     {
-        T ConvertTo(Block block);
+        public Block block { get; set; }
     }
 }

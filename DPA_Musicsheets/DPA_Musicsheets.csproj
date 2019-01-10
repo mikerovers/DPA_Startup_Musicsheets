@@ -103,6 +103,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Chain\AbstractShortcutHandler.cs" />
+    <Compile Include="Chain\ChainOfResponsibility.cs" />
+    <Compile Include="Chain\IShortcutHandler.cs" />
+    <Compile Include="Chain\TimeSignatureHandler.cs" />
+    <Compile Include="Commands\InsertTimeCommand.cs" />
+    <Compile Include="Commands\IShortcutCommand.cs" />
     <Compile Include="Converter\FromConverterFactory.cs" />
     <Compile Include="Converter\IFromConverter.cs" />
     <Compile Include="Converter\Lilypond\BlockDirector.cs" />
@@ -117,7 +123,10 @@
     <Compile Include="Converter\Midi\MetaMessageConverter.cs" />
     <Compile Include="Converter\Midi\MidiConverterMetaData.cs" />
     <Compile Include="Converter\Midi\MidiMessageConverterFactory.cs" />
+    <Compile Include="Converter\Midi\ToMidiConverter.cs" />
+    <Compile Include="Converter\Staffs\ToStaffsConverter.cs" />
     <Compile Include="Converter\ToConverterFactory.cs" />
+    <Compile Include="Events\TextChangedEventArgs.cs" />
     <Compile Include="Managers\BlockContainer.cs" />
     <Compile Include="Managers\MidiToLilyHelper.cs" />
     <Compile Include="Managers\MusicLoader.cs" />
@@ -139,6 +148,10 @@
     <Compile Include="Models\Tempo.cs" />
     <Compile Include="Models\TimeSignature.cs" />
     <Compile Include="Models\Token.cs" />
+    <Compile Include="State\ICanHaveMusicPlayerState.cs" />
+    <Compile Include="State\TextEditedState.cs" />
+    <Compile Include="State\TextEditState.cs" />
+    <Compile Include="State\TextNotEditedState.cs" />
     <Compile Include="ViewModels\MidiPlayerViewModel.cs" />
     <Compile Include="ViewModels\StaffsViewModel.cs" />
     <Compile Include="Views\MidiPlayerCtrl.xaml.cs">

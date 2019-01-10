@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DPA_Musicsheets.Converter
 {
-    interface LilyVisitor
+    public interface LilyVisitor
     {
         void Visit(Block block);
         void Visit(TimeSignature timeSignature);
@@ -20,7 +20,7 @@ namespace DPA_Musicsheets.Converter
         void Visit(Repeat repeat);
     }
 
-    class ToLilyVisitor : LilyVisitor
+    public class ToLilyVisitor : LilyVisitor
     {
         private StringBuilder stringBuilder;
 
@@ -31,12 +31,11 @@ namespace DPA_Musicsheets.Converter
 
         public void Visit(Block block)
         {
-            foreach (var token in block)
-            {
-                this.Visit(token as dynamic);
-            }
-            stringBuilder.Append("}");
-            stringBuilder.AppendLine();
+            if (block != null)
+                foreach (var token in block)
+                {
+                    this.Visit(token as dynamic);
+                }
         }
 
         public void Visit(TimeSignature timeSignature)
@@ -83,12 +82,24 @@ namespace DPA_Musicsheets.Converter
             stringBuilder.Append("{");
             stringBuilder.AppendLine();
             Visit(repeat.block);
+            stringBuilder.Append("}");
+            stringBuilder.AppendLine();
             if (repeat.toRepeat.Count() > 0)
             {
                 stringBuilder.Append($@"\alternative {{");
+                stringBuilder.AppendLine();
                 foreach(Token token in repeat.toRepeat)
                 {
+                    if (token is Block)
+                        stringBuilder.Append(@"{ ");
+
                     Visit(token as dynamic);
+
+                    if (token is Block)
+                    {
+                        stringBuilder.Append("}");
+                        stringBuilder.AppendLine();
+                    }
                 }
                 stringBuilder.Append(@"}");
                 stringBuilder.AppendLine();

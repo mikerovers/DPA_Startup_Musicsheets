@@ -24,7 +24,7 @@
             Grid.Row="1" Grid.Column="1">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged" >
-                    <command:EventToCommand Command="{Binding SelectionChangedCommand}" PassEventArgsToCommand="True"  />
+                    <command:EventToCommand Command="{Binding TextBoxSelectionChangedCommand}" PassEventArgsToCommand="True"  />
                 </i:EventTrigger>
                 <i:EventTrigger EventName="TextChanged" >
                     <command:EventToCommand Command="{Binding TextChangedCommand}" PassEventArgsToCommand="True"  />

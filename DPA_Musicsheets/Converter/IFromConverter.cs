@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace DPA_Musicsheets.Converter
 {
-    interface IFromConverter
+    public interface IFromConverter
     {
-        Block ConvertTo(string fileName);
+        Block ConvertToFromFile(string fileName);
     }
 }

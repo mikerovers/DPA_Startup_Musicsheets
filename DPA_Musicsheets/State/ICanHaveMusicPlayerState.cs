@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DPA_Musicsheets.Converter
+namespace DPA_Musicsheets.State
 {
-    public class ToConverterFactory
+    public interface ICanHaveTextEditState
     {
-
+        
     }
 }

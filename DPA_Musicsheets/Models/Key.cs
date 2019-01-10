@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DPA_Musicsheets.Models
 {
-    class Key
+    public class Key
     {
         public KeyType keyType;
         public int length;

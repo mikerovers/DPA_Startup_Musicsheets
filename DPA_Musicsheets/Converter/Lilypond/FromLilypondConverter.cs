@@ -9,20 +9,26 @@ using DPA_Musicsheets.Models;
 
 namespace DPA_Musicsheets.Converter.Lilypond
 {
-    class FromLilypondConverter : IFromConverter
+    public class FromLilypondConverter : IFromConverter
     {
         private LinkedList<LilypondToken> tokens;
 
-        public Block ConvertTo(string fileName)
+        public Block ConvertTo(string text)
         {
-            var content = GetContent(fileName);
-            tokens = GetTokensFromLilypond(content);
+            tokens = GetTokensFromLilypond(text);
             DebugTokens(tokens);
 
             var director = new BlockDirector();
             var block = director.Build(tokens);
 
             return (Block)block;
+        }
+
+        public Block ConvertToFromFile(string fileName)
+        {
+            var content = GetContent(fileName);
+
+            return ConvertTo(content);
         }
 
         private string GetContent(string fileName)

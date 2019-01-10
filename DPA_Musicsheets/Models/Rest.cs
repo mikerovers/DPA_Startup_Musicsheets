@@ -5,10 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DPA_Musicsheets.Converter;
+using DPA_Musicsheets.Converter.Midi;
 
 namespace DPA_Musicsheets.Models
 {
-    class Rest: Token
+    public class Rest : Token
     {
         public string duration;
 

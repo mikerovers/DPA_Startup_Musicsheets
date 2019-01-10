@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DPA_Musicsheets.Converter;
+using DPA_Musicsheets.Converter.Midi;
 
 namespace DPA_Musicsheets.Models
 {
-    class Tempo : Token
+    public class Tempo : Token
     {
         public int tempo;
         public int upper;

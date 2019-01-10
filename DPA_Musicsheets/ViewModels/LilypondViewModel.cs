@@ -1,4 +1,6 @@
-﻿using DPA_Musicsheets.Managers;
+﻿using DPA_Musicsheets.Chain;
+using DPA_Musicsheets.Converter.Lilypond;
+using DPA_Musicsheets.Managers;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.Win32;
@@ -14,13 +16,26 @@ namespace DPA_Musicsheets.ViewModels
     public class LilypondViewModel : ViewModelBase
     {
         private BlockContainer _blockContainer;
-
+        private FromLilypondConverter _fromLilypondConverter;
+        private ToLilypondConverter _toLilypondConverter;
         private MusicLoader _musicLoader;
         private MainViewModel _mainViewModel { get; set; }
+
+        private bool _change;
 
         private string _text;
         private string _previousText;
         private string _nextText;
+
+        public int CarrotPosition {
+            get
+            {
+                return _blockContainer.CarotIndex;
+            } set
+            {
+                _blockContainer.CarotIndex = value;
+            }
+        }
 
         /// <summary>
         /// This text will be in the textbox.
@@ -50,7 +65,21 @@ namespace DPA_Musicsheets.ViewModels
 
         public LilypondViewModel(MainViewModel mainViewModel, MusicLoader musicLoader, BlockContainer blockContainer)
         {
+            _change = false;
+            _fromLilypondConverter = new FromLilypondConverter();
+            _toLilypondConverter = new ToLilypondConverter();
+
             _blockContainer = blockContainer;
+            _blockContainer.TextChanged += (sender, args) =>
+            {
+                if (_change)
+                {
+                    _textChangedByLoad = true;
+                    LilypondText = _toLilypondConverter.ConvertTo(args.block);
+                    _textChangedByLoad = false;
+                }
+                _change = true;
+            };
             // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer and viewmodels don't know each other?
             // And viewmodels don't 
             _mainViewModel = mainViewModel;
@@ -66,6 +95,35 @@ namespace DPA_Musicsheets.ViewModels
             LilypondText = _previousText = text;
             _textChangedByLoad = false;
         }
+
+        RelayCommand<RoutedEventArgs> _TextBoxSelectionChangedCommand = null;
+        public ICommand TextBoxSelectionChangedCommand
+        {
+            get
+            {
+                if (_TextBoxSelectionChangedCommand == null)
+                {
+                    _TextBoxSelectionChangedCommand = new RelayCommand<RoutedEventArgs>((r) => TextBoxSelectionChanged(r), (r) => true);
+                }
+
+                return _TextBoxSelectionChangedCommand;
+            }
+        }
+
+        protected virtual void TextBoxSelectionChanged(RoutedEventArgs _args)
+        {
+            CarrotPosition = (_args.OriginalSource as System.Windows.Controls.TextBox).SelectionStart;
+        }
+
+        public ICommand OnKeyDownCommand => new RelayCommand<KeyEventArgs>((e) =>
+        {        
+
+        });
+
+        public ICommand OnKeyUpCommand => new RelayCommand<KeyEventArgs>((e) =>
+        {
+            
+        });
 
         /// <summary>
         /// This occurs when the text in the textbox has changed. This can either be by loading or typing.
@@ -87,8 +145,9 @@ namespace DPA_Musicsheets.ViewModels
                         _waitingForRender = false;
                         UndoCommand.RaiseCanExecuteChanged();
 
-                        _musicLoader.LoadLilypondIntoWpfStaffsAndMidi(LilypondText);
+                        _change = false;
                         _mainViewModel.CurrentState = "";
+                        _blockContainer.Block = _fromLilypondConverter.ConvertTo(LilypondText);
                     }
                 }, TaskScheduler.FromCurrentSynchronizationContext()); // Request from main thread.
             }
@@ -97,18 +156,20 @@ namespace DPA_Musicsheets.ViewModels
         #region Commands for buttons like Undo, Redo and SaveAs
         public RelayCommand UndoCommand => new RelayCommand(() =>
         {
-            _nextText = LilypondText;
-            LilypondText = _previousText;
-            _previousText = null;
-        }, () => _previousText != null && _previousText != LilypondText);
+            _blockContainer.UndoBlock();
+            //_nextText = LilypondText;
+            //LilypondText = _previousText;
+            //_previousText = null;
+        }, () => _blockContainer.CanUndoBlock());
 
         public RelayCommand RedoCommand => new RelayCommand(() =>
         {
-            _previousText = LilypondText;
-            LilypondText = _nextText;
-            _nextText = null;
+            //_previousText = LilypondText;
+            //LilypondText = _nextText;
+            //_nextText = null;
+            _blockContainer.RedoBlock();
             RedoCommand.RaiseCanExecuteChanged();
-        }, () => _nextText != null && _nextText != LilypondText);
+        }, () =>  _blockContainer.CanRedoBlock());
 
         public ICommand SaveAsCommand => new RelayCommand(() =>
         {

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DPA_Musicsheets.Converter.Lilypond
 {
-    class BlockDirector
+    public class BlockDirector
     {
         private Note NoteToExtend;
         private LinkedListNode<LilypondToken> currentToken;

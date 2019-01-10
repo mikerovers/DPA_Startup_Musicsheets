@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DPA_Musicsheets.Converter
 {
-    class FromConverterFactory
+    public class FromConverterFactory
     {
         private Dictionary<string, IFromConverter> converters;
 
