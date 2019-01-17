@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DPA_Musicsheets.Commands.Export;
+using DPA_Musicsheets.Managers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,9 +12,7 @@ namespace DPA_Musicsheets.State
     public class TextEditedState : TextEditState
     {
         public TextEditedState(ICanHaveTextEditState context) : base(context)
-        {
-
-        }
+        {}        
 
         public override void Exit()
         {
@@ -22,6 +22,8 @@ namespace DPA_Musicsheets.State
             switch(result)
             {
                 case MessageBoxResult.Yes:
+                    var saveAsCommand = new SaveAsCommand();
+                    saveAsCommand.Execute((BlockContainer)Context);
 
                     break;
                 case MessageBoxResult.No:

@@ -111,6 +111,7 @@
     <Compile Include="Chain\TimeSignatureHandler.cs" />
     <Compile Include="Commands\Export\LilypondExportCommand.cs" />
     <Compile Include="Commands\Export\PDFExportCommand.cs" />
+    <Compile Include="Commands\Export\SaveAsCommand.cs" />
     <Compile Include="Commands\InsertTimeCommand.cs" />
     <Compile Include="Commands\IShortcutCommand.cs" />
     <Compile Include="Commands\NullCommand.cs" />

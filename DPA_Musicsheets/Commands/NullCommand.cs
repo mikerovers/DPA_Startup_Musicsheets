@@ -12,7 +12,6 @@ namespace DPA_Musicsheets.Commands
         public string pattern => "null";
 
         public void Execute(BlockContainer container)
-        {
-        }
+        {}
     }
 }

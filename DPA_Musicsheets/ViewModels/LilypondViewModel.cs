@@ -175,34 +175,8 @@ namespace DPA_Musicsheets.ViewModels
 
         public ICommand SaveAsCommand => new RelayCommand(() =>
         {
-            // TODO: In the application a lot of classes know which filetypes are supported. Lots and lots of repeated code here...
-            // Can this be done better?
-            IShortcutCommand exportCommand = new NullCommand();
-            SaveFileDialog saveFileDialog = new SaveFileDialog() { Filter = "Midi|*.mid|Lilypond|*.ly|PDF|*.pdf" };
-            if (saveFileDialog.ShowDialog() == true)
-            {
-                string extension = Path.GetExtension(saveFileDialog.FileName);
-                if (extension.EndsWith(".mid"))
-                {
-                    _musicLoader.SaveToMidi(saveFileDialog.FileName);
-                }
-                else if (extension.EndsWith(".ly"))
-                {
-                    exportCommand = new LilypondExportCommand();
-                    ((LilypondExportCommand)exportCommand).FileName = saveFileDialog.FileName;
-                }
-                else if (extension.EndsWith(".pdf"))
-                {
-                    exportCommand = new PDFExportCommand();
-                    ((PDFExportCommand)exportCommand).FileName = saveFileDialog.FileName;
-                }
-                else
-                {
-                    MessageBox.Show($"Extension {extension} is not supported.");
-                }
-
-                exportCommand.Execute(_blockContainer);
-            }
+            var saveAsCommand = new SaveAsCommand();
+            saveAsCommand.Execute(_blockContainer);
         });
         #endregion Commands for buttons like Undo, Redo and SaveAs
     }

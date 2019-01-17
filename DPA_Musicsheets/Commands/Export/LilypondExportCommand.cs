@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DPA_Musicsheets.Converter.Lilypond;
 using DPA_Musicsheets.Managers;
+using DPA_Musicsheets.State;
 using Microsoft.Win32;
 
 namespace DPA_Musicsheets.Commands.Export
@@ -34,6 +35,8 @@ namespace DPA_Musicsheets.Commands.Export
                 outputFile.Write(lilypondText);
                 outputFile.Close();
             }
+
+            container.state = new TextNotEditedState(container);
         }
     }
 }
