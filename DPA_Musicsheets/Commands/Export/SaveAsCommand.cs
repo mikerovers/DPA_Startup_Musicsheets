@@ -12,7 +12,7 @@ namespace DPA_Musicsheets.Commands.Export
 {
     class SaveAsCommand : IShortcutCommand
     {
-        public string pattern => throw new NotImplementedException();
+        public string pattern => "save_as";
 
         public void Execute(BlockContainer container)
         {

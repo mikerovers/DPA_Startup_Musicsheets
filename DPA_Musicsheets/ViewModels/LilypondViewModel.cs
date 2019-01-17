@@ -74,13 +74,13 @@ namespace DPA_Musicsheets.ViewModels
             _blockContainer = blockContainer;
             _blockContainer.TextChanged += (sender, args) =>
             {
-                if (_change)
-                {
+                //if (_change)
+               //{
                     _textChangedByLoad = true;
                     LilypondText = _toLilypondConverter.ConvertTo(args.block);
                     _textChangedByLoad = false;
-                }
-                _change = true;
+                //}
+                //_change = true;
             };
             // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer and viewmodels don't know each other?
             // And viewmodels don't 

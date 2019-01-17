@@ -1,4 +1,5 @@
 ﻿using DPA_Musicsheets.Chain;
+using DPA_Musicsheets.Commands.Open;
 using DPA_Musicsheets.Managers;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -69,6 +70,7 @@ namespace DPA_Musicsheets.ViewModels
             _blockContainer.CarotIndex = 0;
             _chainOfResponsibility = new ChainOfResponsibility();
             _chainOfResponsibility.AddHandlerToChain(new TimeSignatureHandler());
+            _chainOfResponsibility.AddHandlerToChain(new OpenFileHandler());
             _chainOfResponsibility.AddHandlerToChain(new SaveAsPDFHandler());
             _chainOfResponsibility.AddHandlerToChain(new SaveAsLilypondHandler());
             _keysDown = new System.Collections.Generic.List<Key>();
@@ -85,7 +87,9 @@ namespace DPA_Musicsheets.ViewModels
 
         public ICommand LoadCommand => new RelayCommand(() =>
         {
-            _musicLoader.OpenFile(FileName);
+            var openFileCommand = new OpenFileCommand();
+            openFileCommand.Execute(_blockContainer);
+            // _musicLoader.OpenFile(FileName);
         });
 
         #region Focus and key commands, these can be used for implementing hotkeys

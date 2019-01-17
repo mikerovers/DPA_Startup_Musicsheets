@@ -1,8 +1,11 @@
-﻿using DPA_Musicsheets.Events;
+﻿using DPA_Musicsheets.Converter;
+using DPA_Musicsheets.Converter.Lilypond;
+using DPA_Musicsheets.Events;
 using DPA_Musicsheets.Models;
 using DPA_Musicsheets.State;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -78,6 +81,20 @@ namespace DPA_Musicsheets.Managers
                 IsRedoingOrUndoing = true;
                 Block = redo.Pop();
             }
+        }
+
+        public void OpenFile(string fileName)
+        {
+            var fromConverterFactory = new FromConverterFactory();
+            var converter = fromConverterFactory.GetConverter(Path.GetExtension(fileName));
+
+            if (converter == null)
+            {
+                throw new NotSupportedException($"File extension {Path.GetExtension(fileName)} is not supported.");
+            }
+
+            Block = converter.ConvertToFromFile(fileName);
+            state = new TextNotEditedState(this);
         }
     }
 }
