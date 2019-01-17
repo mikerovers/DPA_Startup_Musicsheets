@@ -10,6 +10,13 @@ namespace DPA_Musicsheets.Models
 {
     public class NullToken : Token
     {
+        public string value;
+
+        public NullToken(string value)
+        {
+            this.value = value;
+        }
+
         public void AcceptLily(LilyVisitor v)
         {
             v.Visit(this);

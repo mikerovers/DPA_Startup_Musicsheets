@@ -69,6 +69,8 @@ namespace DPA_Musicsheets.ViewModels
             _blockContainer.CarotIndex = 0;
             _chainOfResponsibility = new ChainOfResponsibility();
             _chainOfResponsibility.AddHandlerToChain(new TimeSignatureHandler());
+            _chainOfResponsibility.AddHandlerToChain(new SaveAsPDFHandler());
+            _chainOfResponsibility.AddHandlerToChain(new SaveAsLilypondHandler());
             _keysDown = new System.Collections.Generic.List<Key>();
         }
 

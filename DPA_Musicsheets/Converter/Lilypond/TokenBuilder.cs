@@ -71,7 +71,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
                 case "f":
                     return new Clef(ClefType.f, 4);
                 default:
-                    return new NullToken();
+                    return new NullToken("");
             }
         }
     }
@@ -157,7 +157,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
                 throw new Exception("Invalid Lilypond file.");
             }
 
-            return new NullToken();
+            return new NullToken("");
         }
     }
 
@@ -260,7 +260,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
 
         public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
-            return new NullToken();
+            return new NullToken("");
         }
     }
 

@@ -1,4 +1,6 @@
 ﻿using DPA_Musicsheets.Chain;
+using DPA_Musicsheets.Commands;
+using DPA_Musicsheets.Commands.Export;
 using DPA_Musicsheets.Converter.Lilypond;
 using DPA_Musicsheets.Managers;
 using GalaSoft.MvvmLight;
@@ -175,6 +177,7 @@ namespace DPA_Musicsheets.ViewModels
         {
             // TODO: In the application a lot of classes know which filetypes are supported. Lots and lots of repeated code here...
             // Can this be done better?
+            IShortcutCommand exportCommand = new NullCommand();
             SaveFileDialog saveFileDialog = new SaveFileDialog() { Filter = "Midi|*.mid|Lilypond|*.ly|PDF|*.pdf" };
             if (saveFileDialog.ShowDialog() == true)
             {
@@ -185,16 +188,20 @@ namespace DPA_Musicsheets.ViewModels
                 }
                 else if (extension.EndsWith(".ly"))
                 {
-                    _musicLoader.SaveToLilypond(saveFileDialog.FileName);
+                    exportCommand = new LilypondExportCommand();
+                    ((LilypondExportCommand)exportCommand).FileName = saveFileDialog.FileName;
                 }
                 else if (extension.EndsWith(".pdf"))
                 {
-                    _musicLoader.SaveToPDF(saveFileDialog.FileName);
+                    exportCommand = new PDFExportCommand();
+                    ((PDFExportCommand)exportCommand).FileName = saveFileDialog.FileName;
                 }
                 else
                 {
                     MessageBox.Show($"Extension {extension} is not supported.");
                 }
+
+                exportCommand.Execute(_blockContainer);
             }
         });
         #endregion Commands for buttons like Undo, Redo and SaveAs
