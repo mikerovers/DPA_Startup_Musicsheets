@@ -1,4 +1,6 @@
-﻿using DPA_Musicsheets.Managers;
+﻿using DPA_Musicsheets.Converter.Midi;
+using DPA_Musicsheets.Managers;
+using DPA_Musicsheets.State.Rendering;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using Sanford.Multimedia.Midi;
@@ -13,6 +15,8 @@ namespace DPA_Musicsheets.ViewModels
     public class MidiPlayerViewModel : ViewModelBase
     {
         private OutputDevice _outputDevice;
+        private BlockContainer _blockContainer;
+        private ToMidiConverter _toMidiConverter;
         private bool _running;
 
         // This sequencer creates a possibility to play a sequence.
@@ -30,15 +34,26 @@ namespace DPA_Musicsheets.ViewModels
             }
         }
 
-        public MidiPlayerViewModel(MusicLoader musicLoader)
+        public MidiPlayerViewModel(BlockContainer blockContainer)
         {
             // The OutputDevice is a midi device on the midi channel of your computer.
             // The audio will be streamed towards this output.
             // DeviceID 0 is your computer's audio channel.
             _outputDevice = new OutputDevice(0);
             _sequencer = new Sequencer();
-
             _sequencer.ChannelMessagePlayed += ChannelMessagePlayed;
+
+            _toMidiConverter = new ToMidiConverter();
+            _blockContainer = blockContainer;
+            _blockContainer.RenderingChanged += (sender, args) =>
+            {
+                // Start rendering.
+                if (args.IsRendering)
+                {
+                    MidiSequence = _toMidiConverter.ConvertTo(_blockContainer.Block);
+                    _blockContainer.RenderState = new RenderingOffState();
+                }
+            };
 
             // Wanneer de sequence klaar is moeten we alles closen en stoppen.
             _sequencer.PlayingCompleted += (playingSender, playingEvent) =>
@@ -46,9 +61,6 @@ namespace DPA_Musicsheets.ViewModels
                 _sequencer.Stop();
                 _running = false;
             };
-
-            // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer?
-            musicLoader.MidiPlayerViewModel = this;
         }
 
         private void UpdateButtons()

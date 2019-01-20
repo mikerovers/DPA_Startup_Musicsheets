@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DPA_Musicsheets.State
+namespace DPA_Musicsheets.State.Rendering
 {
-    public interface ICanHaveTextEditState
+    public class RenderingEventArgs : EventArgs
     {
+        public bool IsRendering;
     }
 }

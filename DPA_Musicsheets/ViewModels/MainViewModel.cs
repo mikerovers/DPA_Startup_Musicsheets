@@ -1,6 +1,8 @@
 ﻿using DPA_Musicsheets.Chain;
 using DPA_Musicsheets.Commands.Open;
 using DPA_Musicsheets.Managers;
+using DPA_Musicsheets.State.Render;
+using DPA_Musicsheets.State.Rendering;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Win32;
@@ -52,19 +54,16 @@ namespace DPA_Musicsheets.ViewModels
         /// The current state can be used to display some text.
         /// "Rendering..." is a text that will be displayed for example.
         /// </summary>
-        private string _currentState;
-        public string CurrentState
+        private RenderingState _currentState;
+        public RenderingState CurrentState
         {
             get { return _currentState; }
             set { _currentState = value; RaisePropertyChanged(() => CurrentState); }
         }
 
-        private MusicLoader _musicLoader;
-
-        public MainViewModel(MusicLoader musicLoader, BlockContainer blockContainer)
+        public MainViewModel(BlockContainer blockContainer)
         {
             // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer?
-            _musicLoader = musicLoader;
             FileName = @"Files/Alle-eendjes-zwemmen-in-het-water.mid";
             _blockContainer = blockContainer;
             _blockContainer.CarotIndex = 0;
@@ -91,6 +90,7 @@ namespace DPA_Musicsheets.ViewModels
         {
             var openFileCommand = new OpenFileCommand();
             openFileCommand.Execute(_blockContainer);
+            _blockContainer.RenderState = new RenderingOnState();
             // _musicLoader.OpenFile(FileName);
         });
 
@@ -119,7 +119,7 @@ namespace DPA_Musicsheets.ViewModels
 
         public ICommand OnWindowClosingCommand => new RelayCommand(() =>
         {
-            _blockContainer.state.Exit();
+            _blockContainer.textEditState.Exit();
 
             ViewModelLocator.Cleanup();
         });

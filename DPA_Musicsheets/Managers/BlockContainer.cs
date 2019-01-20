@@ -3,6 +3,8 @@ using DPA_Musicsheets.Converter.Lilypond;
 using DPA_Musicsheets.Events;
 using DPA_Musicsheets.Models;
 using DPA_Musicsheets.State;
+using DPA_Musicsheets.State.Render;
+using DPA_Musicsheets.State.Rendering;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -34,21 +36,33 @@ namespace DPA_Musicsheets.Managers
 
                 block = value;
                 TextChanged.Invoke(this, new TextChangedEventArgs() { block = value });
-                state = new TextEditedState(this);
+                textEditState = new TextEditedState(this);
                 IsRedoingOrUndoing = false;
             }
         }
 
-        public TextEditState state;
+        public RenderingState RenderState
+        {
+            get { return renderingState; }
+            set
+            {
+                renderingState = value;
+                RenderingChanged.Invoke(this, new RenderingEventArgs() { IsRendering = renderingState.IsRendering });
+            }
+        }
+
+        public TextEditState textEditState;
+        private RenderingState renderingState;
 
         public event EventHandler<TextChangedEventArgs> TextChanged;
+        public event EventHandler<RenderingEventArgs> RenderingChanged;
 
         public BlockContainer()
         {
             IsRedoingOrUndoing = false;
             undo = new Stack<Block>();
             redo = new Stack<Block>();
-            state = new TextNotEditedState(this);
+            textEditState = new TextNotEditedState(this);
         }
 
         public bool CanUndoBlock()
@@ -65,7 +79,7 @@ namespace DPA_Musicsheets.Managers
         {
             if (CanUndoBlock())
             {
-                state = new TextEditedState(this);
+                textEditState = new TextEditedState(this);
                 redo.Push(block);
                 IsRedoingOrUndoing = true;
                 Block = undo.Pop();
@@ -76,7 +90,7 @@ namespace DPA_Musicsheets.Managers
         {
             if (CanRedoBlock())
             {
-                state = new TextEditedState(this);
+                textEditState = new TextEditedState(this);
                 undo.Push(block);
                 IsRedoingOrUndoing = true;
                 Block = redo.Pop();
@@ -94,7 +108,7 @@ namespace DPA_Musicsheets.Managers
             }
 
             Block = converter.ConvertToFromFile(fileName);
-            state = new TextNotEditedState(this);
+            textEditState = new TextNotEditedState(this);
         }
     }
 }

@@ -3,6 +3,7 @@ using DPA_Musicsheets.Commands;
 using DPA_Musicsheets.Commands.Export;
 using DPA_Musicsheets.Converter.Lilypond;
 using DPA_Musicsheets.Managers;
+using DPA_Musicsheets.State.Rendering;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.Win32;
@@ -20,14 +21,12 @@ namespace DPA_Musicsheets.ViewModels
         private BlockContainer _blockContainer;
         private FromLilypondConverter _fromLilypondConverter;
         private ToLilypondConverter _toLilypondConverter;
-        private MusicLoader _musicLoader;
         private MainViewModel _mainViewModel { get; set; }
 
         private bool _change;
 
         private string _text;
         private string _previousText;
-        private string _nextText;
 
         public int CarrotPosition {
             get
@@ -65,7 +64,7 @@ namespace DPA_Musicsheets.ViewModels
         private static int MILLISECONDS_BEFORE_CHANGE_HANDLED = 1500;
         private bool _waitingForRender = false;
 
-        public LilypondViewModel(MainViewModel mainViewModel, MusicLoader musicLoader, BlockContainer blockContainer)
+        public LilypondViewModel(MainViewModel mainViewModel, BlockContainer blockContainer)
         {
             _change = false;
             _fromLilypondConverter = new FromLilypondConverter();
@@ -85,8 +84,6 @@ namespace DPA_Musicsheets.ViewModels
             // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer and viewmodels don't know each other?
             // And viewmodels don't 
             _mainViewModel = mainViewModel;
-            _musicLoader = musicLoader;
-            _musicLoader.LilypondViewModel = this;
             
             _text = "\\relative c' { \n\n }";
         }
@@ -138,7 +135,7 @@ namespace DPA_Musicsheets.ViewModels
                 _waitingForRender = true;
                 _lastChange = DateTime.Now;
 
-                _mainViewModel.CurrentState = "Rendering...";
+                _mainViewModel.CurrentState = new RenderingOnState();
 
                 Task.Delay(MILLISECONDS_BEFORE_CHANGE_HANDLED).ContinueWith((task) =>
                 {
@@ -148,8 +145,8 @@ namespace DPA_Musicsheets.ViewModels
                         UndoCommand.RaiseCanExecuteChanged();
 
                         _change = false;
-                        _mainViewModel.CurrentState = "";
                         _blockContainer.Block = _fromLilypondConverter.ConvertTo(LilypondText);
+                        _blockContainer.RenderState = new RenderingOnState();
                     }
                 }, TaskScheduler.FromCurrentSynchronizationContext()); // Request from main thread.
             }

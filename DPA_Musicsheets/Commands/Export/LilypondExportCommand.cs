@@ -36,7 +36,7 @@ namespace DPA_Musicsheets.Commands.Export
                 outputFile.Close();
             }
 
-            container.state = new TextNotEditedState(container);
+            container.textEditState = new TextNotEditedState(container);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace DPA_Musicsheets.State
     public class TextEditedState : TextEditState
     {
         public TextEditedState(ICanHaveTextEditState context) : base(context)
-        {}        
+        {}
 
         public override void Exit()
         {
