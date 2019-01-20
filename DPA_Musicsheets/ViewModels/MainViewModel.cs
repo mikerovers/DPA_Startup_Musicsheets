@@ -27,45 +27,31 @@ namespace DPA_Musicsheets.ViewModels
         private string _fileName;
         public string FileName
         {
-            get
-            {
-                return _fileName;
-            }
-            set
-            {
-                _fileName = value;
-                RaisePropertyChanged(() => FileName);
-            }
+            get { return _fileName; }
+            set { _fileName = value; RaisePropertyChanged(() => FileName); }
         }
 
         public int CarrotPosition
         {
-            get
-            {
-                return _blockContainer.CarotIndex;
-            }
-            set
-            {
-                _blockContainer.CarotIndex = value;
-            }
+            get{ return _blockContainer.CarotIndex; }
+            set { _blockContainer.CarotIndex = value; }
         }
 
-        /// <summary>
-        /// The current state can be used to display some text.
-        /// "Rendering..." is a text that will be displayed for example.
-        /// </summary>
-        private RenderingState _currentState;
-        public RenderingState CurrentState
+        private string _renderText;
+        public string RenderText
         {
-            get { return _currentState; }
-            set { _currentState = value; RaisePropertyChanged(() => CurrentState); }
+            get { return _renderText; }
+            set { _renderText = value; RaisePropertyChanged(() => RenderText); }
         }
 
         public MainViewModel(BlockContainer blockContainer)
         {
-            // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer?
             FileName = @"Files/Alle-eendjes-zwemmen-in-het-water.mid";
             _blockContainer = blockContainer;
+            _blockContainer.RenderingChanged += (sender, args) =>
+            {
+                RenderText = args.StringToPrint;
+            };
             _blockContainer.CarotIndex = 0;
             _chainOfResponsibility = new ChainOfResponsibility();
             _chainOfResponsibility.AddHandlerToChain(new InsertTimeHandler());

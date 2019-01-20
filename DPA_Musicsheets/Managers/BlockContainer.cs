@@ -47,7 +47,7 @@ namespace DPA_Musicsheets.Managers
             set
             {
                 renderingState = value;
-                RenderingChanged.Invoke(this, new RenderingEventArgs() { IsRendering = renderingState.IsRendering });
+                RenderingChanged.Invoke(renderingState, new RenderingEventArgs(renderingState.IsRendering, renderingState.StringToRender));
             }
         }
 
