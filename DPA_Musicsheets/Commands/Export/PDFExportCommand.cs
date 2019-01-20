@@ -34,7 +34,6 @@ namespace DPA_Musicsheets.Commands.Export
             lilypondExportCommand.FileName = tmpFileName;
             lilypondExportCommand.Execute(container);
 
-
             string lilypondLocation = @"C:\Program Files (x86)\LilyPond\usr\bin\lilypond.exe";
             string sourceFolder = Path.GetDirectoryName(tmpFileName);
             string sourceFileName = Path.GetFileNameWithoutExtension(tmpFileName);

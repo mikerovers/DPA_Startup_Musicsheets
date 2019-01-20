@@ -23,7 +23,8 @@ namespace DPA_Musicsheets.Commands.Export
                 string extension = Path.GetExtension(saveFileDialog.FileName);
                 if (extension.EndsWith(".mid"))
                 {
-                    // TODO
+                    exportCommand = new MidiExportCommand();
+                    ((MidiExportCommand)exportCommand).FileName = saveFileDialog.FileName;
                 }
                 else if (extension.EndsWith(".ly"))
                 {

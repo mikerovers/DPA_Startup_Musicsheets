@@ -20,10 +20,8 @@ namespace DPA_Musicsheets.ViewModels
         /// Constructor
         /// </summary>
         /// <param name="musicLoader">We need the musicloader so it can set our staffs.</param>
-        public StaffsViewModel(MusicLoader musicLoader, BlockContainer blockContainer)
+        public StaffsViewModel(BlockContainer blockContainer)
         {
-            // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer?
-            musicLoader.StaffsViewModel = this;
             Staffs = new ObservableCollection<MusicalSymbol>();
 
             _toStaffsConverter = new ToStaffsConverter();

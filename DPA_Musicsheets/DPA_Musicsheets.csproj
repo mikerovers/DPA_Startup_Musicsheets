@@ -113,6 +113,7 @@
     <Compile Include="Chain\SaveAsPDFHandler.cs" />
     <Compile Include="Chain\InsertTimeHandler.cs" />
     <Compile Include="Commands\Export\LilypondExportCommand.cs" />
+    <Compile Include="Commands\Export\MidiExportCommand.cs" />
     <Compile Include="Commands\Export\PDFExportCommand.cs" />
     <Compile Include="Commands\Export\SaveAsCommand.cs" />
     <Compile Include="Commands\Insert\InsertCommand.cs" />
