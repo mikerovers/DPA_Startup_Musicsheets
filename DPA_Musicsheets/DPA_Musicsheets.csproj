@@ -136,7 +136,6 @@
     <Compile Include="Converter\Midi\MidiMessageConverterFactory.cs" />
     <Compile Include="Converter\Midi\ToMidiConverter.cs" />
     <Compile Include="Converter\Staffs\ToStaffsConverter.cs" />
-    <Compile Include="Converter\ToConverterFactory.cs" />
     <Compile Include="Converter\Token\ToTokenConverter.cs" />
     <Compile Include="Events\TextChangedEventArgs.cs" />
     <Compile Include="Managers\BlockContainer.cs" />
@@ -160,7 +159,7 @@
     <Compile Include="Models\TimeSignature.cs" />
     <Compile Include="Models\Token.cs" />
     <Compile Include="State\ICanHaveMusicPlayerState.cs" />
-    <Compile Include="State\Rendering\RenderingEventArgs.cs" />
+    <Compile Include="Events\RenderingEventArgs.cs" />
     <Compile Include="State\Rendering\RenderingOffState.cs" />
     <Compile Include="State\Rendering\RenderingOnState.cs" />
     <Compile Include="State\Rendering\RenderingState.cs" />
