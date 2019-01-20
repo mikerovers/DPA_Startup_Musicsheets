@@ -1,4 +1,5 @@
 ﻿using DPA_Musicsheets.Models;
+using PSAMControlLibrary;
 using Sanford.Multimedia.Midi;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace DPA_Musicsheets.Converter.Midi
     {
         public Sequence ConvertTo(Block block)
         {
-            return new Sequence();
+            throw new NotImplementedException();
         }
     }
 }

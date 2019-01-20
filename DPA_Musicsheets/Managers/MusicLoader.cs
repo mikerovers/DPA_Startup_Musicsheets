@@ -2,6 +2,7 @@
 using DPA_Musicsheets.Converter;
 using DPA_Musicsheets.Converter.Lilypond;
 using DPA_Musicsheets.Converter.Midi;
+using DPA_Musicsheets.Converter.Staffs;
 using DPA_Musicsheets.Converter.Token;
 using DPA_Musicsheets.Models;
 using DPA_Musicsheets.ViewModels;
@@ -87,12 +88,6 @@ namespace DPA_Musicsheets.Managers
             var toTokenConverter = new ToTokenConverter();
             LinkedList<LilypondToken> tokens = toTokenConverter.GetTokensFromLilypond(content);
             WPFStaffs.Clear();
-
-            WPFStaffs.AddRange(GetStaffsFromTokens(tokens));
-            this.StaffsViewModel.SetStaffs(this.WPFStaffs);
-
-            MidiSequence = GetSequenceFromWPFStaffs();
-            MidiPlayerViewModel.MidiSequence = MidiSequence;
         }
 
         #region Midi loading (loads midi to lilypond)

@@ -14,8 +14,10 @@ namespace DPA_Musicsheets.Converter.Token
         public LinkedList<LilypondToken> GetTokensFromLilypond(string lilyContent)
         {
             var tokens = new LinkedList<LilypondToken>();
+            var content = lilyContent.Trim().ToLower().Replace("\r\n", " ").Replace("\n", " ").Replace("  ", " ").Replace("\t", "");
+            var c1 = Regex.Replace(content, " {2,}", " ");
 
-            foreach (string s in lilyContent.Split(' ').Where(item => item.Length > 0))
+            foreach (string s in content.Split(' ').Where(item => item.Length > 0))
             {
                 LilypondToken token = new LilypondToken()
                 {
@@ -55,29 +57,6 @@ namespace DPA_Musicsheets.Converter.Token
             }
 
             return tokens;
-
-            // Make sure that 2 spaces or more do not exist.
-            var blankRegex = new Regex(@"\s+");
-            lilyContent = blankRegex.Replace(lilyContent, " ");
-            var tokenss = new LinkedList<LilypondToken>();
-            var lines = lilyContent.Split(' ').ToList<string>();
-            var tokenFactory = new LilypondTokenizer();
-
-            foreach (var line in lines)
-            {
-                var token = new LilypondToken();
-                token.Value = line;
-                token.TokenKind = tokenFactory.GetToken(line);
-
-                if (token.TokenKind == LilypondTokenKind.Unknown)
-                {
-                    token.TokenKind = ResolveUnknownTokenKind(line);
-                }
-
-                tokenss.AddLast(token);
-            }
-
-            return tokenss;
         }
 
         public void DebugTokens(LinkedList<LilypondToken> tokens)
@@ -85,54 +64,6 @@ namespace DPA_Musicsheets.Converter.Token
             foreach (var token in tokens)
             {
                 System.Console.WriteLine($"{token.TokenKind} - {token.Value}");
-            }
-        }
-
-        private LilypondTokenKind ResolveUnknownTokenKind(string line)
-        {
-            // Check if the line is a note.
-            if (new Regex(@"[a-g][,'eis]*[0-9]+[.]*").IsMatch(line))
-            {
-                return LilypondTokenKind.Note;
-            }
-            // Check if the line is a rest.
-            else if (new Regex(@"r.*?[0-9][.]*").IsMatch(line))
-            {
-                return LilypondTokenKind.Rest;
-            }
-
-            return LilypondTokenKind.Unknown;
-        }
-
-        internal class LilypondTokenizer
-        {
-            public LilypondTokenKind GetToken(string line)
-            {
-                switch (line)
-                {
-                    case @"\alternative":
-                        return LilypondTokenKind.Alternative;
-                    case @"\repeat":
-                        return LilypondTokenKind.Repeat;
-                    case @"\time":
-                        return LilypondTokenKind.Time;
-                    case @"\tempo":
-                        return LilypondTokenKind.Tempo;
-                    case @"\relative":
-                        return LilypondTokenKind.Staff;
-                    case @"\clef":
-                        return LilypondTokenKind.Clef;
-                    case @"|":
-                        return LilypondTokenKind.Bar;
-                    case @"~":
-                        return LilypondTokenKind.Extend;
-                    case @"{":
-                        return LilypondTokenKind.SectionStart;
-                    case @"}":
-                        return LilypondTokenKind.SectionEnd;
-                    default:
-                        return LilypondTokenKind.Unknown;
-                }
             }
         }
     }

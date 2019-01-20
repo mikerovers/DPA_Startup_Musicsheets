@@ -74,6 +74,7 @@ namespace DPA_Musicsheets.Converter
         {
             stringBuilder.Append("|");
             stringBuilder.AppendLine();
+            stringBuilder.Append("\t");
         }
 
         public void Visit(Repeat repeat)
@@ -81,6 +82,7 @@ namespace DPA_Musicsheets.Converter
             stringBuilder.Append($@"\repeat volta {repeat.repeat} ");
             stringBuilder.Append("{");
             stringBuilder.AppendLine();
+            stringBuilder.Append("\t");
             Visit(repeat.block);
             stringBuilder.Append("}");
             stringBuilder.AppendLine();
@@ -91,7 +93,9 @@ namespace DPA_Musicsheets.Converter
                 foreach(DPA_Musicsheets.Models.Token token in repeat.toRepeat)
                 {
                     if (token is Block)
+                    {
                         stringBuilder.Append(@"{ ");
+                    }
 
                     Visit(token as dynamic);
 
