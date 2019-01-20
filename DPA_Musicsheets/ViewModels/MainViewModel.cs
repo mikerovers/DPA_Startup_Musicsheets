@@ -69,7 +69,9 @@ namespace DPA_Musicsheets.ViewModels
             _blockContainer = blockContainer;
             _blockContainer.CarotIndex = 0;
             _chainOfResponsibility = new ChainOfResponsibility();
-            _chainOfResponsibility.AddHandlerToChain(new TimeSignatureHandler());
+            _chainOfResponsibility.AddHandlerToChain(new InsertTimeHandler());
+            _chainOfResponsibility.AddHandlerToChain(new InsertTempoHandler());
+            _chainOfResponsibility.AddHandlerToChain(new InsertClefHandler());
             _chainOfResponsibility.AddHandlerToChain(new OpenFileHandler());
             _chainOfResponsibility.AddHandlerToChain(new SaveAsPDFHandler());
             _chainOfResponsibility.AddHandlerToChain(new SaveAsLilypondHandler());

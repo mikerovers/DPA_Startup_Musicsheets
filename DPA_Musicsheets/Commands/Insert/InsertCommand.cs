@@ -8,16 +8,23 @@ using DPA_Musicsheets.Managers;
 
 namespace DPA_Musicsheets.Commands
 {
-    public class InsertTimeCommand : IShortcutCommand
+    public class InsertCommand : IShortcutCommand
     {
-        public string pattern => "insert_time";
+        public string pattern => "insert_text";
         private FromLilypondConverter fromLilypondConverter = new FromLilypondConverter();
         private ToLilypondConverter toLilypondConverter = new ToLilypondConverter();
+        private string _text;
+
+        public InsertCommand(string text)
+        {
+            _text = text;
+        }
 
         public void Execute(BlockContainer container)
         {
             var text = toLilypondConverter.ConvertTo(container.Block);
-            text = text.Substring(0, container.CarotIndex) + "\time 4/4" + text.Substring(container.CarotIndex, text.Length - container.CarotIndex);
+            text = text.Insert(container.CarotIndex, _text);
+            // text = text.Substring(0, container.CarotIndex) + _text + text.Substring(container.CarotIndex, text.Length - container.CarotIndex);
             container.Block = fromLilypondConverter.ConvertTo(text);
         }
     }

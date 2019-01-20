@@ -88,7 +88,7 @@ namespace DPA_Musicsheets.ViewModels
             _musicLoader = musicLoader;
             _musicLoader.LilypondViewModel = this;
             
-            _text = "Your lilypond text will appear here.";
+            _text = "\\relative c' { \n\n }";
         }
 
         public void LilypondTextLoaded(string text)

@@ -1,4 +1,4 @@
-﻿using DPA_Musicsheets.Models;   
+﻿using DPA_Musicsheets.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
 {
     interface ITokenBuilder
     {
-        Token BuildToken(Block block, Queue<LilypondToken> currentToken);
+        DPA_Musicsheets.Models.Token BuildToken(Block block, Queue<LilypondToken> currentToken);
     }
 
     abstract class TokenBuilder : ITokenBuilder
@@ -19,7 +19,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
 
         public TokenBuilder(TokenBuilderFactory builderFactory) => this.builderFactory = builderFactory;
 
-        public abstract Token BuildToken(Block block, Queue<LilypondToken> currentToken);
+        public abstract DPA_Musicsheets.Models.Token BuildToken(Block block, Queue<LilypondToken> currentToken);
         protected Block CreateBlock(Queue<LilypondToken> currentToken)
         {
             var block = new Block();
@@ -44,7 +44,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
+        public override DPA_Musicsheets.Models.Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
             return CreateBlock(currentToken);
         }
@@ -56,7 +56,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
+        public override DPA_Musicsheets.Models.Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
             currentToken.Dequeue();
             switch (currentToken.Peek().Value)
@@ -82,7 +82,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
+        public override DPA_Musicsheets.Models.Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
             currentToken.Dequeue();
             string[] timeData = currentToken.Peek().Value.Split('/');
@@ -96,7 +96,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
+        public override DPA_Musicsheets.Models.Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
             currentToken.Dequeue();
             string[] tempoData = currentToken.Peek().Value.Split('=');
@@ -110,7 +110,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
+        public override DPA_Musicsheets.Models.Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
             currentToken.Dequeue();
             if (currentToken.Peek().Value != "volta")
@@ -140,7 +140,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
+        public override DPA_Musicsheets.Models.Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
             currentToken.Dequeue();
             if (currentToken.Peek().Value != "{")
@@ -167,7 +167,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
+        public override DPA_Musicsheets.Models.Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
             var newNote = new Note();
             newNote.length = HandleLength(currentToken.Peek().Value);
@@ -246,7 +246,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
+        public override DPA_Musicsheets.Models.Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
             return new Bar();
         }
@@ -258,7 +258,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
+        public override DPA_Musicsheets.Models.Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
             return new NullToken("");
         }
@@ -270,7 +270,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
+        public override DPA_Musicsheets.Models.Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
             return CreateBlock(currentToken);
         }
@@ -282,7 +282,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
+        public override DPA_Musicsheets.Models.Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
             return block;
         }
@@ -294,7 +294,7 @@ namespace DPA_Musicsheets.Converter.Lilypond
         {
         }
 
-        public override Token BuildToken(Block block, Queue<LilypondToken> currentToken)
+        public override DPA_Musicsheets.Models.Token BuildToken(Block block, Queue<LilypondToken> currentToken)
         {
             return new Rest(HandleLength(currentToken.Peek().Value));
         }

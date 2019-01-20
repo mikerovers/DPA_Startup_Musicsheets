@@ -8,19 +8,19 @@ using System.Threading.Tasks;
 
 namespace DPA_Musicsheets.Chain
 {
-    public class TimeSignatureHandler : AbstractShortcutHandler
+    class InsertClefHandler : AbstractShortcutHandler
     {
-        private InsertTimeCommand insertTimeCommand = new InsertTimeCommand();
+        private IShortcutCommand command;
 
         public override object Handle(List<System.Windows.Input.Key> keyDown, BlockContainer _container)
         {
-            if (
-                keyDown.Contains(System.Windows.Input.Key.LeftCtrl)
-                && keyDown.Contains(System.Windows.Input.Key.H)
-                )
+            if (keyDown.Contains(System.Windows.Input.Key.LeftCtrl)
+                && keyDown.Contains(System.Windows.Input.Key.E))
             {
-                System.Console.WriteLine("Inputting timesignature.");
-                insertTimeCommand.Execute(_container);
+                command = new InsertCommand("\\clef treble");
+                command.Execute(_container);
+                System.Console.WriteLine("Inputting clef.");
+
                 return "";
             }
             else

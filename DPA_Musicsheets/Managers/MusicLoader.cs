@@ -2,6 +2,7 @@
 using DPA_Musicsheets.Converter;
 using DPA_Musicsheets.Converter.Lilypond;
 using DPA_Musicsheets.Converter.Midi;
+using DPA_Musicsheets.Converter.Token;
 using DPA_Musicsheets.Models;
 using DPA_Musicsheets.ViewModels;
 using PSAMControlLibrary;
@@ -83,7 +84,8 @@ namespace DPA_Musicsheets.Managers
         {
             LilypondText = content;
             content = content.Trim().ToLower().Replace("\r\n", " ").Replace("\n", " ").Replace("  ", " ");
-            LinkedList<LilypondToken> tokens = GetTokensFromLilypond(content);
+            var toTokenConverter = new ToTokenConverter();
+            LinkedList<LilypondToken> tokens = toTokenConverter.GetTokensFromLilypond(content);
             WPFStaffs.Clear();
 
             WPFStaffs.AddRange(GetStaffsFromTokens(tokens));
@@ -94,22 +96,6 @@ namespace DPA_Musicsheets.Managers
         }
 
         #region Midi loading (loads midi to lilypond)
-
-        /// <summary>
-        /// TODO: Create our own domain classes to be independent of external libraries/languages.
-        /// </summary>
-        /// <param name="sequence"></param>
-        /// <returns></returns>
-        public string LoadMidiIntoLilypond(Sequence sequence)
-        {
-            FromMidiConverter converter = new FromMidiConverter();
-            var block = converter.ConvertTo(sequence);
-
-            ToLilypondConverter toLilypondConverter = new ToLilypondConverter();
-            var output = toLilypondConverter.ConvertTo(block);
-
-            return output;  
-        }
 
         #endregion Midiloading (loads midi to lilypond)
 
@@ -251,52 +237,7 @@ namespace DPA_Musicsheets.Managers
 
             return symbols;
         }
-        
-        private static LinkedList<LilypondToken> GetTokensFromLilypond(string content)
-        {
-            var tokens = new LinkedList<LilypondToken>();
 
-            foreach (string s in content.Split(' ').Where(item => item.Length > 0))
-            {
-                LilypondToken token = new LilypondToken()
-                {
-                    Value = s
-                };
-
-                switch (s)
-                {
-                    case "\\relative": token.TokenKind = LilypondTokenKind.Staff; break;
-                    case "\\clef": token.TokenKind = LilypondTokenKind.Clef; break;
-                    case "\\time": token.TokenKind = LilypondTokenKind.Time; break;
-                    case "\\tempo": token.TokenKind = LilypondTokenKind.Tempo; break;
-                    case "\\repeat": token.TokenKind = LilypondTokenKind.Repeat; break;
-                    case "\\alternative": token.TokenKind = LilypondTokenKind.Alternative; break;
-                    case "{": token.TokenKind = LilypondTokenKind.SectionStart; break;
-                    case "}": token.TokenKind = LilypondTokenKind.SectionEnd; break;
-                    case "|": token.TokenKind = LilypondTokenKind.Bar; break;
-                    default: token.TokenKind = LilypondTokenKind.Unknown; break;
-                }
-
-                if (token.TokenKind == LilypondTokenKind.Unknown && new Regex(@"[~]?[a-g][,'eis]*[0-9]+[.]*").IsMatch(s))
-                {
-                    token.TokenKind = LilypondTokenKind.Note;
-                }
-                else if (token.TokenKind == LilypondTokenKind.Unknown && new Regex(@"r.*?[0-9][.]*").IsMatch(s))
-                {
-                    token.TokenKind = LilypondTokenKind.Rest;
-                }
-
-                if (tokens.Last != null)
-                {
-                    tokens.Last.Value.NextToken = token;
-                    token.PreviousToken = tokens.Last.Value;
-                }
-
-                tokens.AddLast(token);
-            }
-
-            return tokens;
-        }
         #endregion Staffs loading (loads lilypond to WPF staffs)
 
         #region Saving to files

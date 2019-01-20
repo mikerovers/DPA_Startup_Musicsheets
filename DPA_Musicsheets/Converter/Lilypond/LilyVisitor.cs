@@ -88,7 +88,7 @@ namespace DPA_Musicsheets.Converter
             {
                 stringBuilder.Append($@"\alternative {{");
                 stringBuilder.AppendLine();
-                foreach(Token token in repeat.toRepeat)
+                foreach(DPA_Musicsheets.Models.Token token in repeat.toRepeat)
                 {
                     if (token is Block)
                         stringBuilder.Append(@"{ ");

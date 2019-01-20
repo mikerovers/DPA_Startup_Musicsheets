@@ -105,15 +105,17 @@
     </ApplicationDefinition>
     <Compile Include="Chain\AbstractShortcutHandler.cs" />
     <Compile Include="Chain\ChainOfResponsibility.cs" />
+    <Compile Include="Chain\InsertClefHandler.cs" />
+    <Compile Include="Chain\InsertTempoHandler.cs" />
     <Compile Include="Chain\IShortcutHandler.cs" />
     <Compile Include="Chain\OpenFileHandler.cs" />
     <Compile Include="Chain\SaveAsLilypondHandler.cs" />
     <Compile Include="Chain\SaveAsPDFHandler.cs" />
-    <Compile Include="Chain\TimeSignatureHandler.cs" />
+    <Compile Include="Chain\InsertTimeHandler.cs" />
     <Compile Include="Commands\Export\LilypondExportCommand.cs" />
     <Compile Include="Commands\Export\PDFExportCommand.cs" />
     <Compile Include="Commands\Export\SaveAsCommand.cs" />
-    <Compile Include="Commands\InsertTimeCommand.cs" />
+    <Compile Include="Commands\Insert\InsertCommand.cs" />
     <Compile Include="Commands\IShortcutCommand.cs" />
     <Compile Include="Commands\NullCommand.cs" />
     <Compile Include="Commands\Open\OpenFileCommand.cs" />
@@ -134,6 +136,7 @@
     <Compile Include="Converter\Midi\ToMidiConverter.cs" />
     <Compile Include="Converter\Staffs\ToStaffsConverter.cs" />
     <Compile Include="Converter\ToConverterFactory.cs" />
+    <Compile Include="Converter\Token\ToTokenConverter.cs" />
     <Compile Include="Events\TextChangedEventArgs.cs" />
     <Compile Include="Managers\BlockContainer.cs" />
     <Compile Include="Managers\MidiToLilyHelper.cs" />
