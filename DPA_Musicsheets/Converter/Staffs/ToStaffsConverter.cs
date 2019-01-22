@@ -151,7 +151,6 @@ namespace DPA_Musicsheets.Converter.Staffs
 
                 parent.inAlternative = true;
                 parent.inRepeat = false;
-       // Skip the first bracket open.
             }
         }
 

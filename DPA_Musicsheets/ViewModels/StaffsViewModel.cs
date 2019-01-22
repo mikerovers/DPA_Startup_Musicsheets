@@ -31,8 +31,7 @@ namespace DPA_Musicsheets.ViewModels
 
         private void HandleTextChanged(Object sender, TextChangedEventArgs args)
         {
-            var symbols = _toStaffsConverter.ConvertTo(args.block);
-            SetStaffs(symbols);
+            
         }
 
         /// <summary>
