@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DPA_Musicsheets.Models;
+using Sanford.Multimedia.Midi;
 
-namespace DPA_Musicsheets.Managers
+namespace DPA_Musicsheets.Converter.Midi
 {
-    /// <summary>
-    /// TODO: Static classes with static helper methods are not done. Can a better domain class help with this?
-    /// </summary>
-    public static class MidiToLilyHelper
+    abstract class AbstractMidiMessageConverter : IMidiMessageConverter
     {
-        public static string GetLilypondNoteLength(int absoluteTicks, int nextNoteAbsoluteTicks, int division, int beatNote, int beatsPerBar, out double percentageOfBar)
+        protected string GetLilypondNoteLength(int absoluteTicks, int nextNoteAbsoluteTicks, int division, int beatNote, int beatsPerBar, out double percentageOfBar)
         {
             int duration = 0;
             int dots = 0;
@@ -81,7 +80,7 @@ namespace DPA_Musicsheets.Managers
             return duration + new String('.', dots);
         }
 
-        public static string GetLilyNoteName(int previousMidiKey, int midiKey)
+        protected string GetLilyNoteName(int previousMidiKey, int midiKey)
         {
             int octave = (midiKey / 12) - 1;
             string name = "";
@@ -140,5 +139,7 @@ namespace DPA_Musicsheets.Managers
 
             return name;
         }
+
+        public abstract void Parse(IMidiMessage message, MidiEvent midiEvent, MidiConverterMetaData metaData, Block block);
     }
 }

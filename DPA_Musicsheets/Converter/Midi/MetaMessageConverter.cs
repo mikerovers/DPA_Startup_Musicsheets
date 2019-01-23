@@ -9,12 +9,12 @@ using Sanford.Multimedia.Midi;
 
 namespace DPA_Musicsheets.Converter.Midi
 {
-    class MetaMessageConverter : IMidiMessageConverter
+    class MetaMessageConverter : AbstractMidiMessageConverter
     {
         MidiConverterMetaData metaData;
         Block block;
 
-        public void Parse(IMidiMessage message, MidiEvent midiEvent, MidiConverterMetaData metaData, Block block)
+        public override void Parse(IMidiMessage message, MidiEvent midiEvent, MidiConverterMetaData metaData, Block block)
         {
             this.metaData = metaData;
             this.block = block;
@@ -65,7 +65,7 @@ namespace DPA_Musicsheets.Converter.Midi
             if (metaData.previousNoteAbsoluteTicks > 0)
             {
                 double percentageOfBar;
-                string length = MidiToLilyHelper.GetLilypondNoteLength(metaData.previousNoteAbsoluteTicks, e.AbsoluteTicks, metaData.division, metaData._beatNote, metaData._beatsPerBar, out percentageOfBar);
+                string length = GetLilypondNoteLength(metaData.previousNoteAbsoluteTicks, e.AbsoluteTicks, metaData.division, metaData._beatNote, metaData._beatsPerBar, out percentageOfBar);
                 metaData.CurNote.length = length;
 
                 metaData.previousNoteAbsoluteTicks = e.AbsoluteTicks;

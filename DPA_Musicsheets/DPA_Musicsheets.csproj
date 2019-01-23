@@ -124,6 +124,7 @@
     <Compile Include="Converter\IFromConverter.cs" />
     <Compile Include="Converter\Lilypond\BlockDirector.cs" />
     <Compile Include="Converter\Lilypond\TokenBuilder.cs" />
+    <Compile Include="Converter\Midi\AbstractMidiMessageConverter.cs" />
     <Compile Include="Converter\Midi\IMidiMessageConverter.cs" />
     <Compile Include="Converter\IToConverter.cs" />
     <Compile Include="Converter\Lilypond\FromLilypondConverter.cs" />
@@ -139,7 +140,6 @@
     <Compile Include="Converter\Token\ToTokenConverter.cs" />
     <Compile Include="Events\TextChangedEventArgs.cs" />
     <Compile Include="Managers\BlockContainer.cs" />
-    <Compile Include="Managers\MidiToLilyHelper.cs" />
     <Compile Include="Models\Bar.cs" />
     <Compile Include="Models\Clef.cs" />
     <Compile Include="Models\ClefType.cs" />
